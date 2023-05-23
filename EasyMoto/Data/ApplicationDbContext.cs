@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using EasyMoto.Models;
 
 namespace EasyMoto.Data
 {
@@ -10,13 +9,5 @@ namespace EasyMoto.Data
             : base(options)
         {
         }
-
-        // ********************************************
-        // Criação das tabelas da BD
-        // ********************************************
-        public DbSet<Produtos> Produtos{ get; set; }
-        public DbSet<Utilizadores> Utilizadores { get; set; }
-        public DbSet<Categorias> Categorias{ get; set; }
-        public DbSet<Fotografias> Fotografias { get; set; }
     }
 }

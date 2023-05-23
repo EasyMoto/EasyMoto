@@ -7,6 +7,11 @@ namespace EasyMoto.Models
     /// </summary>
     public class Utilizadores
     {
+        public Utilizadores()
+        {
+            // Inicialização da Lista de Produtos associadas a um Utilizador
+            ListaProdutos = new HashSet<Produtos>();
+        }
         /// <summary>
         /// PK
         /// </summary>
@@ -42,6 +47,15 @@ namespace EasyMoto.Models
         /// </summary>
         public string NIF { get; set; }
 
+        /// <summary>
+        /// Lista dos Produtos do Utilizador
+        /// </summary>
+        public ICollection<Produtos> ListaProdutos { get; set; }
+
+        /// <summary>
+        /// Lista das Categorias do Utilizador
+        /// </summary>
+        public ICollection<Categorias> ListaCategorias { get; set; }
 
     }
 }

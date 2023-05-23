@@ -16,7 +16,7 @@ namespace EasyMoto.Data
         // Criação das tabelas da BD
         // ********************************************
         public DbSet<Produtos> Produtos { get; set; }
-        public DbSet<Utilizadores> Utilizadores{ get; set; }
+        public DbSet<Utilizadores> Utilizadores { get; set; }
         public DbSet<Categorias> Categorias { get; set; }
         public DbSet<Fotografias> Fotografias { get; set; }
 

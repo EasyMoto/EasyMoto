@@ -23,12 +23,16 @@ namespace EasyMoto.Models
         /// Nome do utilizador
         /// </summary>
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
+        [StringLength(40, MinimumLength = 6)]
+        [RegularExpression("[A-Za-zÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõ ç]+")]
         public string Nome { get; set; }
 
         /// <summary>
         /// Morada do utilizador
         /// </summary>
         [Required(ErrorMessage = "A {0} é de preenchimento obrigatório")]
+        [StringLength(40, MinimumLength = 6, ErrorMessage = "A {0} deve ter no mínimo {1} caracteres")]
+        [RegularExpression("[A-Za-z0-9ÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõç, -]+")]
         public string Morada { get; set; }
 
         /// <summary>
@@ -36,8 +40,8 @@ namespace EasyMoto.Models
         /// </summary>
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
         [Display(Name = "Código Postal")]
-        [RegularExpression("[1-9][0-9]{3}-[0-9]{3} [A-ZÇÁÉÍÓÚ]+[A-Z -ÁÉÍÓÚÇ]*",
-           ErrorMessage = "O {0} deve ser escrito no formato XXXX-XXX NOME DA TERRA")]
+        [RegularExpression("[1-9][0-9]{3}-[0-9]{3} [A-ZÇÁÉÍÓÚÃÀÈÌÒÙ]+[A-Z -ÁÃÉÍÓÚÇÀÈÌÒÙ]*",
+        ErrorMessage = "O {0} deve ser escrito no formato XXXX-XXX NOME DA TERRA")]
         public string CodPostal { get; set; }
 
         /// <summary>
@@ -57,8 +61,11 @@ namespace EasyMoto.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        [RegularExpression("[1235689][0-9]{8}", ErrorMessage ="O {0} deve ser válido")]
-        [StringLength(9, MinimumLength =9, ErrorMessage = "O {0} deve ter {1} dígitos")]
+        /// <summary>
+        /// NIF do Utilizador
+        /// </summary>
+        [StringLength(9, MinimumLength = 9, ErrorMessage = "O {0} deve ter {1} dígitos")]
+        [RegularExpression("[1235689][0-9]{8}", ErrorMessage = "Tem de escrever um {0} válido")]
         public string NIF { get; set; }
 
         // *********************************************

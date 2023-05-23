@@ -70,7 +70,7 @@ namespace EasyMoto.Controllers
                                                   .ToList();
 
 
-            // Passar mensagens de erro para a View Create
+            // Passar mensagens de erro para a View 
             ViewBag.ErrorMessages = errorMessages;
 
             return View(utilizadores);

@@ -1,7 +1,38 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EasyMoto.Models
 {
+    public enum TamanhoProduto
+    {
+        XXS,
+        XS,
+        S,
+        M,
+        L,
+        XL,
+        XXL,
+        XXXL
+    }
+
+    public enum TiposGenero
+    {
+        Masculino,
+        Feminino,
+        Unissexo
+    }
+
+    public enum TiposColecao
+    {
+        Verão,
+        Inverno,
+        [Display(Name = "Todo o Ano")]
+        TodoOAno
+    }
+
+
+
     /// <summary>
     /// Dados dos Produtos
     /// </summary>
@@ -20,38 +51,54 @@ namespace EasyMoto.Models
         /// <summary>
         /// Nome do Produto
         /// </summary>
+        [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
+        [StringLength(30, MinimumLength = 3, ErrorMessage = "O nome do {0} deve ter de {2} a {1} caracteres")]
+        [RegularExpression("[A-Za-zÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõ ç0-9]+", ErrorMessage = "Deve introduzir um {0} válido")]
         public string Nome { get; set; }
 
         /// <summary>
         /// Preço do Produto
         /// </summary>
+        /// 
+        [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
+        [StringLength(6, MinimumLength = 1, ErrorMessage = "O {0} deve ter de {2} a {1} caracteres")]
+        [RegularExpression("[0-9,€]+", ErrorMessage = "Deve introduzir um {0} válido")]
+        [Display(Name = "Preço")]
         public string Preco { get; set; }
 
         /// <summary>
         /// Descrição do Produto
         /// </summary>
+        [Display(Name = "Descrição")]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "O {0} deve ter de {2} a {1} caracteres")]
         public string Descricao { get; set; }
 
         /// <summary>
         /// Tamanho do Produto
+        /// XXS, XS, S, M, L, XL, XXL, XXXL
         /// </summary>
-        public string Tamanho { get; set; }
+        public TamanhoProduto Tamanho { get; set; }
 
         /// <summary>
         /// Genero do Produto
-        /// Masculino ou Feminino
+        /// Masculino, Feminino ou Unissexo
         /// </summary>
-        public string Genero { get; set; }
+        public TiposGenero Genero { get; set; }
 
         /// <summary>
         /// Cor do Produto
         /// </summary>
+        [Required(ErrorMessage = "A {0} é de preenchimento obrigatório")]
+        [StringLength(15, MinimumLength = 3, ErrorMessage = "A {0} deve ter de {2} a {1} caracteres")]
+        [RegularExpression("[A-Za-zÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõ ç]+")]
         public string Cor { get; set; }
 
         /// <summary>
-        /// Tipo de coleção do Produto (ex: Inverno, Verão, etc)
+        /// Tipo de coleção do Produto
+        /// Inverno, Verão, Todo o Ano )
         /// </summary>
-        public string Colecao { get; set; }
+        [Display(Name =" Coleção")]
+        public TiposColecao Colecao { get; set; }
 
         ///
         /// Chaves Forasteiras

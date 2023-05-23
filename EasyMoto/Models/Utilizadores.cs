@@ -23,8 +23,8 @@ namespace EasyMoto.Models
         /// Nome do utilizador
         /// </summary>
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
-        [StringLength(40, MinimumLength = 6)]
-        [RegularExpression("[A-Za-zÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõ ç]+")]
+        [StringLength(40, MinimumLength = 6, ErrorMessage ="O {0} deve ter no mínimo {2} e no máximo {1} caracteres")]
+        [RegularExpression("[A-Za-zÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõ ç]+", ErrorMessage = "Deve introduzir um {0} válido")]
         public string Nome { get; set; }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace EasyMoto.Models
         /// </summary>
         [Required(ErrorMessage = "A {0} é de preenchimento obrigatório")]
         [StringLength(40, MinimumLength = 6, ErrorMessage = "A {0} deve ter no mínimo {1} caracteres")]
-        [RegularExpression("[A-Za-z0-9ÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõç, -]+")]
+        [RegularExpression("[A-Za-z0-9ÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõç, -]+", ErrorMessage = "Deve introduzir uma {0} válida")]
         public string Morada { get; set; }
 
         /// <summary>
@@ -40,25 +40,22 @@ namespace EasyMoto.Models
         /// </summary>
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
         [Display(Name = "Código Postal")]
-        [RegularExpression("[1-9][0-9]{3}-[0-9]{3} [A-ZÇÁÉÍÓÚÃÀÈÌÒÙ]+[A-Z -ÁÃÉÍÓÚÇÀÈÌÒÙ]*",
-        ErrorMessage = "O {0} deve ser escrito no formato XXXX-XXX NOME DA TERRA")]
+        [RegularExpression("[1-9][0-9]{3}-[0-9]{3} [A-ZÇÁÉÍÓÚÃÀÈÌÒÙ]+[A-Z -ÁÃÉÍÓÚÇÀÈÌÒÙ]*", ErrorMessage = "O {0} deve ser escrito no formato XXXX-XXX NOME DA TERRA")]
         public string CodPostal { get; set; }
 
         /// <summary>
         /// Telemóvel do utilizador
         /// </summary>
         [Display(Name = "Telemóvel")]
-        [StringLength(9, MinimumLength = 9,
-           ErrorMessage = "O {0} tem de ter {1} digitos")]
-        [RegularExpression("9[1236][0-9]{7}",
-           ErrorMessage = "Tem de escrever um nº de {0} válido")]
+        [StringLength(9, MinimumLength = 9, ErrorMessage = "O {0} tem de ter {1} digitos")]
+        [RegularExpression("9[1236][0-9]{7}", ErrorMessage = "Tem de escrever um nº de {0} válido")]
         public string Telemovel { get; set; }
 
         /// <summary>
         /// Email do utilizador
         /// </summary>
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Deve introduzir um {0} válido")]
         public string Email { get; set; }
 
         /// <summary>

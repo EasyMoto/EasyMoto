@@ -67,8 +67,15 @@
             @*Dropdown para a Categoria*@
             <div class="form-group">
                 <label asp-for="CategoriaFK" class="control-label">Categoria</label>
-                <select asp-for="CategoriaFK" class ="form-control" asp-items="ViewBag.CategoriaFK">
+                <select asp-for="CategoriaFK" class ="form-control" asp-items="ViewBag.CategoriaNome">
                     <option value="0">Escolha uma Categoria</option>
+                </select>
+            </div>
+            @*Dropdown para a Marca*@
+            <div class="form-group">
+                <label asp-for="CategoriaFK" class="control-label">Marca</label>
+                <select asp-for="CategoriaFK" class="form-control" asp-items="ViewBag.CategoriaMarca">
+                    <option value="0">Escolha uma Marca</option>
                 </select>
             </div>
             @*DropDown para o Utilizador*@

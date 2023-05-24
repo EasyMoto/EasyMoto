@@ -73,7 +73,8 @@ namespace EasyMoto.Controllers
         {
             //chaves forasteiras para as tabelas "Categorias" e " Utilizadores"
             //preparar os dados que vão ficar associados às chaves forasteiras - trasportar dados do Controller para a View
-            ViewData["CategoriaFK"] = new SelectList(_context.Categorias, "Id", "Nome");
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome");
+            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca");
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome");
             return View();
         }
@@ -83,7 +84,7 @@ namespace EasyMoto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,UtilizadorFK")] Produtos produtos)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,MarcaFK,UtilizadorFK")] Produtos produtos)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +92,8 @@ namespace EasyMoto.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoriaFK"] = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
+            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produtos.CategoriaFK);
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produtos.UtilizadorFK);
             return View(produtos);
         }
@@ -109,7 +111,8 @@ namespace EasyMoto.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoriaFK"] = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
+            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produtos.CategoriaFK);
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produtos.UtilizadorFK);
             return View(produtos);
         }
@@ -146,7 +149,8 @@ namespace EasyMoto.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoriaFK"] = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
+            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produtos.CategoriaFK);
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produtos.UtilizadorFK);
             return View(produtos);
         }

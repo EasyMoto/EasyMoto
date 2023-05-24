@@ -116,6 +116,7 @@ namespace EasyMoto.Models
         public int CategoriaFK { get; set; }
         public Categorias Categoria { get; set; }
 
+
         /// <summary>
         /// FK para o Utilizador
         /// </summary>

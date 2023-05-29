@@ -1,12 +1,12 @@
 ﻿@model EasyMoto.Models.Utilizadores
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar";
 }
 
-<h2>apagar Utilizador</h2>
+<h2>Eliminar Utilizador</h2>
 
-<h3>Tem a certea de que quer apagar?</h3>
+<h3>Pretende eliminar o utilizador?</h3>
 <div>
     <hr />
     <dl class="row">
@@ -50,7 +50,7 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Apagar" class="btn btn-danger" /> |
+        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
         <a asp-action="Index">Voltar à Lista</a>
     </form>
 </div>

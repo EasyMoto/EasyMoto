@@ -7,19 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EasyMoto.Data;
 using EasyMoto.Models;
+using Microsoft.Extensions.Hosting;
+using System.Globalization;
 
 namespace EasyMoto.Controllers
 {
     public class ProdutosController : Controller
-    {   
+    {
         /// <summary>
         /// atribuot para representar a Base de Dados
         /// </summary>
         private readonly ApplicationDbContext _context;
+
+        private readonly IWebHostEnvironment _environment;
+
         //Instanciar no Construtor
-        public ProdutosController(ApplicationDbContext context)
-        {
+        public ProdutosController(ApplicationDbContext context, IWebHostEnvironment environment)
+         {
+           
             _context = context;
+            _environment = environment;
         }
 
         /// <summary>
@@ -82,20 +89,122 @@ namespace EasyMoto.Controllers
         // POST: Produtos/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// o metodo create é usado quando fazemos o submit do novo produto e vamos ter um atributo = produto (SINGULAR) 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,MarcaFK,UtilizadorFK")] Produtos produtos)
-        {
-            if (ModelState.IsValid)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,MarcaFK,UtilizadorFK")] Produtos produto, IFormFile fotografia) { 
+                //vars auxiliar
+                bool existeFoto = false;
+                string  nomeFoto = "";
+            
+               if (produto.CategoriaFK == 0){
+                // se escolhi uma categoria
+                // gerar mensagem de erro
+                ModelState.AddModelError("", "Deve escolher uma categoria, por favor.");
+            } else {
+                if (produto.UtilizadorFK == 0)
+                    // não escolhi o utilizador
+                {
+                    ModelState.AddModelError("", "Deve escolher um utilizador, por favor.");
+                }
+                else {
+                    // se cheguei aqui é porqu e escolhi uma categoria e um utilizador
+                    // vamos avaliar o ficheiro, se é que ele existe 
+                    if (fotografia == null)
+                    {
+                        // não há ficheiro (imagem)
+                        produto.ListaFotografias.Add(new Fotografias
+                        {
+                            Data = DateTime.Now,
+                            Ficheiro = "noProduct.jpg"
+                        });
+
+                    }else {
+
+                        // se chego aqui, existe ficheiro
+                        // mas será imagem?
+                        if (fotografia.ContentType != "image/jpeg" &&
+                            fotografia.ContentType != "image/png") {
+                            // existe ficheiro mas não é uma imagem 
+                            // <=> ! (fotografia.ContentType == "image/jpeg" || fotografia.ContentType == "image/png")
+                            
+                                ModelState.AddModelError("", "Forneceu um ficheiro que não é uma imagem. Escolha, um ficheiro do tipo PNG ou JPG.");
+                            }
+
+                            else {
+                                // há imagem 
+                                existeFoto = true; 
+                                // definir o nome do ficheiro
+                                Guid g = Guid.NewGuid();
+                                // transforma o guid que é um objeto no texto correspondente 
+                                 nomeFoto = produto.UtilizadorFK + "_" + g.ToString();
+                                // o objeto path dá-nos a extensão do nome que é colado no fileName, tolower para ficar tudo em minusculas(?)
+                                string extensao = Path.GetExtension(fotografia.FileName).ToLower();
+                                nomeFoto+= extensao;
+                                // onde o guardar?
+                                // vamos gurardor o ficheiro na pasta 'wwwroot'
+                                // mas apenas após guardarmos os dados do produto na BD 
+
+                                // guardar os dados do ficheiro na BD
+                                produto.ListaFotografias
+                                    .Add(new Fotografias {
+                                        Ficheiro=nomeFoto,
+                                        Data = DateTime.Now,
+                                });
+
+
+                            }
+                        }
+                    }
+                }
+            
+
+        
+            try
             {
-                _context.Add(produtos);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                        // adicionar os dados do 'produto'
+                        // à BD, mas apenas na memoria do servidor web
+                    _context.Add(produto);
+                        // transferir os dados para a BD
+                    await _context.SaveChangesAsync();
+
+                        // se cheguei aqui, vamos guardar o ficheiro no disco rígido
+                        if (existeFoto) 
+                        {
+                            string nomePastaFoto = _environment.WebRootPath;
+                            // juntar o nome da pasta onde serão guardadas as imagens
+                            nomePastaFoto = Path.Combine(nomePastaFoto, "imagens");
+                            //mas a pasta existe?
+                            if (!Directory.Exists(nomePastaFoto))
+                            { 
+                                Directory.CreateDirectory(nomePastaFoto);
+                            }
+
+                            //vamos iniciar a escrita do ficheiro no disco rigido
+                            nomeFoto = Path.Combine(nomePastaFoto, nomeFoto);
+                            using var stream = new FileStream(nomeFoto, FileMode.Create);
+                            await fotografia.CopyToAsync(stream);
+
+
+                        }
+                        
+
+                    return RedirectToAction(nameof(Index));
+                }
+            } catch (Exception) 
+                
+                { ModelState.AddModelError("", "Ocorreu um erro no acesso à base de dados");
+                //throw;
             }
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
-            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produtos.CategoriaFK);
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produtos.UtilizadorFK);
-            return View(produtos);
+
+            // preparar os dados para serem devolvidos para  View 
+
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias.OrderBy(r=>r.Nome), "Id", "Nome", produto.CategoriaFK);
+            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produto.CategoriaFK);
+            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
+            return View(produto);
         }
 
         // GET: Produtos/Edit/5
@@ -122,9 +231,9 @@ namespace EasyMoto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,UtilizadorFK")] Produtos produtos)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,UtilizadorFK")] Produtos produto)
         {
-            if (id != produtos.Id)
+            if (id != produto.Id)
             {
                 return NotFound();
             }
@@ -133,12 +242,12 @@ namespace EasyMoto.Controllers
             {
                 try
                 {
-                    _context.Update(produtos);
+                    _context.Update(produto);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProdutosExists(produtos.Id))
+                    if (!ProdutosExists(produto.Id))
                     {
                         return NotFound();
                     }
@@ -149,10 +258,10 @@ namespace EasyMoto.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
-            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produtos.CategoriaFK);
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produtos.UtilizadorFK);
-            return View(produtos);
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produto.CategoriaFK);
+            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produto.CategoriaFK);
+            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
+            return View(produto);
         }
 
         // GET: Produtos/Delete/5

@@ -8,10 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using EasyMoto.Data;
 using EasyMoto.Models;
 
-namespace EasyMoto.Controllers
-{
-    public class UtilizadoresController : Controller
-    {
+namespace EasyMoto.Controllers {
+
+    public class UtilizadoresController : Controller {
+
+        /// <summary>
+        /// objeto para referenciar a base de dados 
+        /// </summary>
         private readonly ApplicationDbContext _context;
 
         public UtilizadoresController(ApplicationDbContext context)

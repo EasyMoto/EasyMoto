@@ -27,8 +27,7 @@ namespace EasyMoto.Models
     {
         Verão,
         Inverno,
-        [Display(Name = "Todo o Ano")]
-        TodoOAno
+        Anual
     }
 
 
@@ -52,7 +51,7 @@ namespace EasyMoto.Models
         /// Nome do Produto
         /// </summary>
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
-        [StringLength(30, MinimumLength = 3, ErrorMessage = "O nome do {0} deve ter de {2} a {1} caracteres")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "O nome do {0} deve ter de {2} a {1} caracteres")]
         [RegularExpression("[A-Za-zÀÈÌÒÙÁÉÍÓÚÃÕÇÀÈÌÒÙáéíóúãõ ç0-9]+", ErrorMessage = "Deve introduzir um {0} válido")]
         public string Nome { get; set; }
 
@@ -61,7 +60,7 @@ namespace EasyMoto.Models
         /// </summary>
         /// 
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
-        [StringLength(6, MinimumLength = 1, ErrorMessage = "O {0} deve ter de {2} a {1} caracteres")]
+        [StringLength(7, MinimumLength = 1, ErrorMessage = "O {0} deve ter de {2} a {1} caracteres")]
         [RegularExpression("[0-9,€]+", ErrorMessage = "Deve introduzir um {0} válido")]
         [Display(Name = "Preço")]
         public string Preco { get; set; }
@@ -70,7 +69,7 @@ namespace EasyMoto.Models
         /// Descrição do Produto
         /// </summary>
         [Display(Name = "Descrição")]
-        [StringLength(100, MinimumLength = 1, ErrorMessage = "O {0} deve ter de {2} a {1} caracteres")]
+        [StringLength(500, MinimumLength = 1, ErrorMessage = "O {0} deve ter de {2} a {1} caracteres")]
         public string Descricao { get; set; }
 
         /// <summary>
@@ -83,6 +82,7 @@ namespace EasyMoto.Models
         /// Genero do Produto
         /// Masculino, Feminino ou Unissexo
         /// </summary>
+        [Display(Name ="Género")]
         public TiposGenero Genero { get; set; }
 
         /// <summary>
@@ -115,6 +115,7 @@ namespace EasyMoto.Models
         [ForeignKey(nameof(Categoria))]
         public int CategoriaFK { get; set; }
         public Categorias Categoria { get; set; }
+
 
         /// <summary>
         /// FK para o Utilizador

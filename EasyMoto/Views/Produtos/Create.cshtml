@@ -1,0 +1,120 @@
+﻿@model EasyMoto.Models.Produtos
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Criar Produto</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+
+        @* no formulário é necessário especificar a opção enctype="multipart/form-data" para garantir que o formulário exporta os ficheiros *@
+        <form asp-action="Create" enctype="multipart/form-data">
+
+            @* zona para mostrar mensagens de erro *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* item do formulário *@
+            <div class="form-group">
+                <label asp-for="Nome" class="control-label"></label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Preco" class="control-label"></label>
+                <input asp-for="Preco" class="form-control" />
+                <span asp-validation-for="Preco" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Descricao" class="control-label"></label>
+                <textarea asp-for="Descricao" class="form-control"></textarea>
+                <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tamanho" class="control-label"></label>
+                <select asp-for="Tamanho" class="form-control">
+                    <option value="0">Escolha um Tamanho</option>
+                    @foreach (var tam in Enum.GetValues(typeof(TamanhoProduto)))
+                    {
+                        <option value="@tam">@tam</option>
+                    }
+                </select>
+                <span asp-validation-for="Tamanho" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Genero" class="control-label"></label>
+                <select asp-for="Genero" class="form-control">
+                    <option value="0">Escolha um Género</option>
+                    @foreach (var gen in Enum.GetValues(typeof(TiposGenero)))
+                    {
+                        <option value="@gen">@gen</option>
+                    }
+                </select>
+                <span asp-validation-for="Genero" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cor" class="control-label"></label>
+                <input asp-for="Cor" class="form-control" />
+                <span asp-validation-for="Cor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Colecao" class="control-label"></label>
+                <select asp-for="Colecao" class="form-control">
+                    <option value="0">Escolha a Coleção</option>
+                    @foreach (var tipo in Enum.GetValues(typeof(TiposColecao)))
+                    {
+                        <option value="@tipo">@tipo</option>
+                    }
+                </select>
+                <span asp-validation-for="Colecao" class="text-danger"></span>
+            </div>
+            @*Dropdown para a Categoria*@
+            <div class="form-group">
+                <label asp-for="CategoriaFK" class="control-label">Categoria</label>
+                <select asp-for="CategoriaFK" class ="form-control" asp-items="ViewBag.CategoriaNome">
+                    <option value="0">Escolha uma Categoria</option>
+                </select>
+            </div>
+            @*Dropdown para a Marca*@
+            <div class="form-group">
+                <label asp-for="CategoriaFK" class="control-label">Marca</label>
+                <select asp-for="CategoriaFK" class="form-control" asp-items="ViewBag.CategoriaMarca">
+                    <option value="0">Escolha uma Marca</option>
+                </select>
+            </div>
+            @*DropDown para o Utilizador*@
+            <div class="form-group">
+                <label asp-for="UtilizadorFK" class="control-label">Utilizador</label>
+                <select asp-for="UtilizadorFK" class="form-control" asp-items="ViewBag.UtilizadorFK">
+                    <option value="0">Escolha um Utilizador</option>
+                </select>
+            </div>
+
+
+
+            @* 'file picker' para efectuar a submissão de uma imagem *@
+            <div class="form-group">
+                <label class="control-label">Fotografia</label>
+                <input type="file" accept=".png, .jpg, .jpeg" name="fotografia" />
+            </div>
+
+
+
+            <div class="form-group">
+                <input type="submit" value="Criar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Voltar à lista</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

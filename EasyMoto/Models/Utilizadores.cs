@@ -58,6 +58,20 @@ namespace EasyMoto.Models
         [EmailAddress(ErrorMessage = "Deve introduzir um {0} válido")]
         public string Email { get; set; }
 
+
+        //********************************************
+
+
+        /// <summary>
+        ///quando o utilizador colocar um email vou ter uma chave FORASTEIRA que vai fazer a sincronização
+        ///elemento de ligação entre a base de dados da autenticação e a base de dados do 'negócio'
+        /// </summary>
+        public string UserId { get; set; }
+
+        //********************************************
+
+
+
         /// <summary>
         /// NIF do Utilizador
         /// </summary>

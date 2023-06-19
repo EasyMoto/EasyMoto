@@ -9,9 +9,14 @@ using EasyMoto.Data;
 using EasyMoto.Models;
 using Microsoft.Extensions.Hosting;
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace EasyMoto.Controllers
 {
+
+    [Authorize] //impede o acesso a utilizadores não autenticados
+
     public class ProdutosController : Controller
     {
         /// <summary>
@@ -19,7 +24,20 @@ namespace EasyMoto.Controllers
         /// </summary>
         private readonly ApplicationDbContext _context;
 
+        // ferramenta para.... 
+        private readonly UserManager<IdentityUser> _userManager;
+
         private readonly IWebHostEnvironment _environment;
+
+        public ProdutosController (
+            ApplicationDbContext context, UserManager<IdentityUser> userManager, IWebHostEnvironment environment)
+        {
+            _context = context;
+            _userManager = userManager;
+            _environment = environment;
+        }
+
+
 
         //Instanciar no Construtor
         public ProdutosController(ApplicationDbContext context, IWebHostEnvironment environment)
@@ -56,10 +74,16 @@ namespace EasyMoto.Controllers
                 return NotFound();
             }
 
+
+            //var auxiliar 
+            var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
+
+
             // pesquisar os dados dos animais, para os mostrar no ecrã
             var produto = await _context.Produtos// alterar nome da variavel para singular porque apenas estamos à procura de um animal
                 .Include(p => p.Categoria)
                 .Include(p => p.Utilizador)
+                .Where(p => p.Utilizador.UserId==userIdDaPessoaAutenticada)
                 .FirstOrDefaultAsync(m => m.Id == id);// igual ao LIMIT 1 caso retorne mais do que 1 resultado
 
             // proteção à pesquisa, caso o Id não exista

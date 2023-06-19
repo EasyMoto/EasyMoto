@@ -7,8 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EasyMoto.Data;
 using EasyMoto.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EasyMoto.Controllers {
+
+    [Authorize] // esta anotação obriga o utilizador a estar autenticado 
 
     public class UtilizadoresController : Controller {
 
@@ -17,12 +20,17 @@ namespace EasyMoto.Controllers {
         /// </summary>
         private readonly ApplicationDbContext _context;
 
+ 
+
         public UtilizadoresController(ApplicationDbContext context)
+
         {
             _context = context;
+
         }
 
         // GET: Utilizadores
+        [AllowAnonymous] // esta anotação vai permitir anular a restrição de acesso
         public async Task<IActionResult> Index()
         {
               return _context.Utilizadores != null ? 
@@ -49,35 +57,35 @@ namespace EasyMoto.Controllers {
         }
 
         // GET: Utilizadores/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        //public IActionResult Create()
+        //{
+        //    return View();
+        //}
 
         // POST: Utilizadores/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Morada,CodPostal,Telemovel,Email,NIF")] Utilizadores utilizadores)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(utilizadores);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            // Apanhar mensagens de erro
-            var errorMessages = ModelState.Values.SelectMany(v => v.Errors)
-                                                  .Select(e => e.ErrorMessage)
-                                                  .ToList();
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("Id,Nome,Morada,CodPostal,Telemovel,Email,NIF")] Utilizadores utilizadores)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Add(utilizadores);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    // Apanhar mensagens de erro
+        //    var errorMessages = ModelState.Values.SelectMany(v => v.Errors)
+        //                                          .Select(e => e.ErrorMessage)
+        //                                          .ToList();
 
 
-            // Passar mensagens de erro para a View 
-            ViewBag.ErrorMessages = errorMessages;
+        //    // Passar mensagens de erro para a View 
+        //    ViewBag.ErrorMessages = errorMessages;
 
-            return View(utilizadores);
-        }
+        //    return View(utilizadores);
+        //}
 
         // GET: Utilizadores/Edit/5
         public async Task<IActionResult> Edit(int? id)

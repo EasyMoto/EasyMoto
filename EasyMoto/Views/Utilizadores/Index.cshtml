@@ -55,9 +55,18 @@
                 @Html.DisplayFor(modelItem => item.NIF)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+               @*se a pessoa estiver autenticada mostro *@
+               @if (User.Identity.IsAuthenticated)
+               {
+                   <text>
+                   <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                   <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+                   <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+                   </text>         
+               }
+
+                
+
             </td>
         </tr>
 }

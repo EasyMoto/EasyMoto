@@ -6,9 +6,9 @@
 
 <h1>Utilizadores</h1>
 
-<p>
+@*<p>
     <a asp-action="Create">Criar novo Utilizador</a>
-</p>
+</p>*@
 <table class="table">
     <thead>
         <tr>
@@ -53,11 +53,10 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.NIF)
-            </td>
             <td>
                @*se a pessoa estiver autenticada mostro *@
-               @if (User.Identity.IsAuthenticated)
-               {
+                    @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
+                    {
                    <text>
                        <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
                        <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |

@@ -47,6 +47,7 @@ namespace EasyMoto.Controllers
         /// Return  await porque o método é assíncrono
         /// </returns>
         // GET: Produtos
+        [AllowAnonymous] 
         public async Task<IActionResult> Index() //invoka a view que está aqui (Index)
         {
 

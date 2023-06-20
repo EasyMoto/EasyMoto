@@ -21,25 +21,44 @@ namespace EasyMoto.Controllers {
         /// </summary>
         private readonly ApplicationDbContext _context;
 
-        // FERRAMENTA
+        /// <summary>
+        /// ferramenta para aceder aos dados do utilizador
+        /// </summary>
         private readonly UserManager<IdentityUser> _userManager;
 
         //construtor
-        public UtilizadoresController(ApplicationDbContext context)
+        public UtilizadoresController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
 
         {
             _context = context;
+            _userManager = userManager;
 
         }
+
 
         // GET: Utilizadores
-        [AllowAnonymous] // esta anotação vai permitir anular a restrição de acesso
         public async Task<IActionResult> Index()
         {
-              return _context.Utilizadores != null ? 
+            if (!User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+
+            if (User.Identity.Name == "admin@easymoto.com")
+            {
+                return _context.Utilizadores != null ?
                           View(await _context.Utilizadores.ToListAsync()) :
-                          Problem("Não existem utilizadores.");
+                          Problem("Entity set 'ApplicationDbContext.Categorias'  is null.");
+            }
+            else
+            {
+                var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
+                var applicationDbContext = _context.Utilizadores
+                    .Where(a => a.UserId == userIdDaPessoaAutenticada);
+                return View(await applicationDbContext.ToListAsync());
+            }
         }
+
 
         // GET: Utilizadores/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -51,6 +70,7 @@ namespace EasyMoto.Controllers {
 
             var utilizadores = await _context.Utilizadores
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (utilizadores == null)
             {
                 return NotFound();
@@ -58,6 +78,7 @@ namespace EasyMoto.Controllers {
 
             return View(utilizadores);
         }
+
 
         // GET: Utilizadores/Create
         //public IActionResult Create()

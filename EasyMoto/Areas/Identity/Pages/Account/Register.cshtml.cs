@@ -87,7 +87,7 @@ namespace EasyMoto.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "O {0} deve ser válido")]
             /// obrigatoriedade de preechimento de email
             [EmailAddress]
             [Display(Name = "Email")]
@@ -97,7 +97,7 @@ namespace EasyMoto.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "A {0} é de preenchimento obrigatório")]
             [StringLength(100, ErrorMessage = "A {0} deve ter entre {1} e {2} caracteres.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
@@ -109,6 +109,7 @@ namespace EasyMoto.Areas.Identity.Pages.Account
             /// </summary>
             /// datatype obriga a que a password fique escondida para a interface 
             [DataType(DataType.Password)]
+            [Required(ErrorMessage = "A {0} é de preenchimento obrigatório")]
             [Display(Name = "Confirmar password")]
             [Compare("Password", ErrorMessage = "A password e a sua confirmação não coicidem.")]
             public string ConfirmPassword { get; set; }

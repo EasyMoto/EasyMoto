@@ -7,11 +7,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EasyMoto.Data;
 using EasyMoto.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EasyMoto.Controllers
 {
+    [Authorize] //pedir acesso para visualizar
     public class CategoriasController : Controller
     {
+        /// <summary>
+        /// referenciar a BD
+        /// </summary>
         private readonly ApplicationDbContext _context;
 
         public CategoriasController(ApplicationDbContext context)

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EasyMoto.Data;
 using EasyMoto.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace EasyMoto.Controllers {
 
@@ -20,8 +21,10 @@ namespace EasyMoto.Controllers {
         /// </summary>
         private readonly ApplicationDbContext _context;
 
- 
+        // FERRAMENTA
+        private readonly UserManager<IdentityUser> _userManager;
 
+        //construtor
         public UtilizadoresController(ApplicationDbContext context)
 
         {
@@ -35,7 +38,7 @@ namespace EasyMoto.Controllers {
         {
               return _context.Utilizadores != null ? 
                           View(await _context.Utilizadores.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Utilizadores'  is null.");
+                          Problem("Não existem utilizadores.");
         }
 
         // GET: Utilizadores/Details/5

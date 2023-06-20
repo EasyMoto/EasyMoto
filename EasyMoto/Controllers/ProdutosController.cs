@@ -14,8 +14,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace EasyMoto.Controllers
 {
-
-    [Authorize] //impede o acesso a utilizadores não autenticados
+    [Authorize] // esta anotação obriga o utilizador a estar autenticado
 
     public class ProdutosController : Controller
     {
@@ -23,28 +22,22 @@ namespace EasyMoto.Controllers
         /// atribuot para representar a Base de Dados
         /// </summary>
         private readonly ApplicationDbContext _context;
-
-        // ferramenta para.... 
+        /// <summary>
+        /// objeto com os dados do servidor web
+        /// </summary>
+        private readonly IWebHostEnvironment _environment;
+        /// <summary>
+        /// ferramenta para aceder aos dados do utilizador
+        /// </summary>
         private readonly UserManager<IdentityUser> _userManager;
 
-        private readonly IWebHostEnvironment _environment;
-
-        public ProdutosController (
-            ApplicationDbContext context, UserManager<IdentityUser> userManager, IWebHostEnvironment environment)
-        {
-            _context = context;
-            _userManager = userManager;
-            _environment = environment;
-        }
-
-
-
         //Instanciar no Construtor
-        public ProdutosController(ApplicationDbContext context, IWebHostEnvironment environment)
+        public ProdutosController(ApplicationDbContext context, IWebHostEnvironment environment, UserManager<IdentityUser> userManager)
          {
            
             _context = context;
             _environment = environment;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -56,9 +49,14 @@ namespace EasyMoto.Controllers
         // GET: Produtos
         public async Task<IActionResult> Index() //invoka a view que está aqui (Index)
         {
+
+            // var auxiliar
+            var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
+
             var applicationDbContext = _context.Produtos
                                                     .Include(p => p.Categoria)
-                                                    .Include(p => p.Utilizador);
+                                                    .Include(p => p.Utilizador)
+                                                    .Where(a => a.Utilizador.UserId == userIdDaPessoaAutenticada);
 
 
             // invoco a view, fornecendo-lhe os dados que ela necessita
@@ -74,16 +72,10 @@ namespace EasyMoto.Controllers
                 return NotFound();
             }
 
-
-            //var auxiliar 
-            var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
-
-
             // pesquisar os dados dos animais, para os mostrar no ecrã
             var produto = await _context.Produtos// alterar nome da variavel para singular porque apenas estamos à procura de um animal
                 .Include(p => p.Categoria)
                 .Include(p => p.Utilizador)
-                .Where(p => p.Utilizador.UserId==userIdDaPessoaAutenticada)
                 .FirstOrDefaultAsync(m => m.Id == id);// igual ao LIMIT 1 caso retorne mais do que 1 resultado
 
             // proteção à pesquisa, caso o Id não exista
@@ -239,7 +231,12 @@ namespace EasyMoto.Controllers
                 return NotFound();
             }
 
-            var produtos = await _context.Produtos.FindAsync(id);
+            // var auxiliar
+            var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
+
+            var produtos = await _context.Produtos.Where(a => a.Id == id && a.Utilizador.UserId == userIdDaPessoaAutenticada).FirstOrDefaultAsync();
+
+
             if (produtos == null)
             {
                 return NotFound();

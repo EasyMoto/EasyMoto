@@ -34,6 +34,9 @@ namespace EasyMoto.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// referência à BD do projeto
+        /// </summary>
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
@@ -58,7 +61,7 @@ namespace EasyMoto.Areas.Identity.Pages.Account
 
 
         /// <summary>
-        /// objeto usado para recolher os dados
+        /// objeto usado para recolher os dados de quem se regista
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
@@ -121,10 +124,8 @@ namespace EasyMoto.Areas.Identity.Pages.Account
 
 
         /// <summary>
-        /// este método reage quando o pedido da página é feito por uma 
+        /// este método reage quando o pedido da página é feito por GET
         /// </summary>
-
-
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
@@ -142,6 +143,7 @@ namespace EasyMoto.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
             // apenas necessário se se desejasse a autenticação pr agentes externos
            // ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
                 //se tudo o que preenchi na pagina do registo está valido

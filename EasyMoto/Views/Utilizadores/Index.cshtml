@@ -4,7 +4,7 @@
     ViewData["Title"] = "Início";
 }
 
-<h1>Lista de Utilizadores</h1>
+<h1>Utilizadores</h1>
 
 <p>
     <a asp-action="Create">Criar novo Utilizador</a>
@@ -59,13 +59,11 @@
                @if (User.Identity.IsAuthenticated)
                {
                    <text>
-                   <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                   <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
-                   <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+                       <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                       <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+                       <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
                    </text>         
                }
-
-                
 
             </td>
         </tr>

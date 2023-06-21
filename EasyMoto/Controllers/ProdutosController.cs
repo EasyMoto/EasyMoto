@@ -10,9 +10,11 @@ using EasyMoto.Models;
 using Microsoft.Extensions.Hosting;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EasyMoto.Controllers
 {
+    [Authorize]
     public class ProdutosController : Controller
     {
         /// <summary>
@@ -43,6 +45,7 @@ namespace EasyMoto.Controllers
         /// Return  await porque o método é assíncrono
         /// </returns>
         // GET: Produtos
+        [AllowAnonymous]
         public async Task<IActionResult> Index() //invoka a view que está aqui (Index)
         {
             var applicationDbContext = _context.Produtos
@@ -56,6 +59,7 @@ namespace EasyMoto.Controllers
         }
 
         // GET: Produtos/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)//"?" significa que é um parâmetro que pode ser nulo
         {// proteção à pesquisa, caso a tabela dos Produtos esteja vazia ou o Id seja nulo
             if (id == null || _context.Produtos == null)
@@ -73,7 +77,7 @@ namespace EasyMoto.Controllers
             // proteção à pesquisa, caso o Id não exista
             if (produto == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
 
             return View(produto);
@@ -86,6 +90,11 @@ namespace EasyMoto.Controllers
         // GET: Produtos/Create
         public IActionResult Create()
         {
+            if (User.Identity.Name != "admin@easymoto.com")
+            {
+                //retornar para Index se o utilizador não tiver acesso
+                return RedirectToAction("Index");
+            }
             //chaves forasteiras para as tabelas "Categorias" e " Utilizadores"
             //preparar os dados que vão ficar associados às chaves forasteiras - trasportar dados do Controller para a View
             ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome");
@@ -230,17 +239,25 @@ namespace EasyMoto.Controllers
         // GET: Produtos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (User.Identity.Name != "admin@easymoto.com")
+            {
+                //retornar para Index se o utilizador não tiver acesso
+                return RedirectToAction("Details", new { id = id });
+            }
             if (id == null || _context.Produtos == null)
             {
-                return NotFound();
+                return RedirectToAction("Index");
             }
 
             //para que não seja possível alterar o URL e editar produtos
-            var produtos = await _context.Produtos.Where(a => a.Utilizador.Nome == "Administrador").FirstOrDefaultAsync();
+            var produtos = await _context.Produtos
+                                     .Where(a => a.Id == id &&
+                                                 a.Utilizador.Nome == "Administrador")
+                                     .FirstOrDefaultAsync();
 
             if (produtos == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
             ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
             ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produtos.CategoriaFK);
@@ -253,8 +270,13 @@ namespace EasyMoto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,UtilizadorFK")] Produtos produto, IFormFile fotografia)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,MarcaFK,UtilizadorFK")] Produtos produto, IFormFile fotografia)
         {
+            if (id != produto.Id)
+            {
+                return RedirectToAction("Index");
+            }
+
             //vars auxiliar
             bool existeFoto = false;
             string nomeFoto = "";
@@ -330,14 +352,13 @@ namespace EasyMoto.Controllers
             }
 
 
-
             try
             {
                 if (ModelState.IsValid)
                 {
                     // adicionar os dados do 'produto'
                     // à BD, mas apenas na memoria do servidor web
-                    _context.Add(produto);
+                    _context.Update(produto);
                     // transferir os dados para a BD
                     await _context.SaveChangesAsync();
 
@@ -366,26 +387,31 @@ namespace EasyMoto.Controllers
                 }
             }
             catch (Exception)
-
             {
+  
                 ModelState.AddModelError("", "Ocorreu um erro no acesso à base de dados");
                 //throw;
             }
 
-            // preparar os dados para serem devolvidos para  View 
 
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias.OrderBy(r => r.Nome), "Id", "Nome", produto.CategoriaFK);
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produto.CategoriaFK);
             ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produto.CategoriaFK);
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
             return View(produto);
         }
 
+
         // GET: Produtos/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (User.Identity.Name != "admin@easymoto.com")
+            {
+                //retornar para Index se o utilizador não tiver acesso
+                return RedirectToAction("Index");
+            }
             if (id == null || _context.Produtos == null)
             {
-                return NotFound();
+                return RedirectToAction("Index");
             }
 
             var produtos = await _context.Produtos
@@ -394,7 +420,7 @@ namespace EasyMoto.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (produtos == null)
             {
-                return NotFound();
+                return RedirectToAction("Index");
             }
 
             return View(produtos);

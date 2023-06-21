@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EasyMoto.Data;
 using EasyMoto.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace EasyMoto.Controllers {
 
@@ -20,23 +21,44 @@ namespace EasyMoto.Controllers {
         /// </summary>
         private readonly ApplicationDbContext _context;
 
- 
+        /// <summary>
+        /// ferramenta para aceder aos dados do utilizador
+        /// </summary>
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UtilizadoresController(ApplicationDbContext context)
+        //construtor
+        public UtilizadoresController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
 
         {
             _context = context;
+            _userManager = userManager;
 
         }
+
 
         // GET: Utilizadores
-        [AllowAnonymous] // esta anotação vai permitir anular a restrição de acesso
         public async Task<IActionResult> Index()
         {
-              return _context.Utilizadores != null ? 
+            if (!User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+
+            if (User.Identity.Name == "admin@easymoto.com")
+            {
+                return _context.Utilizadores != null ?
                           View(await _context.Utilizadores.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Utilizadores'  is null.");
+                          Problem("Entity set 'ApplicationDbContext.Categorias'  is null.");
+            }
+            else
+            {
+                var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
+                var applicationDbContext = _context.Utilizadores
+                    .Where(a => a.UserId == userIdDaPessoaAutenticada);
+                return View(await applicationDbContext.ToListAsync());
+            }
         }
+
 
         // GET: Utilizadores/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -48,6 +70,7 @@ namespace EasyMoto.Controllers {
 
             var utilizadores = await _context.Utilizadores
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (utilizadores == null)
             {
                 return NotFound();
@@ -55,6 +78,7 @@ namespace EasyMoto.Controllers {
 
             return View(utilizadores);
         }
+
 
         // GET: Utilizadores/Create
         //public IActionResult Create()

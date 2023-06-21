@@ -86,8 +86,16 @@
                     <option value="0">Escolha um Utilizador</option>
                 </select>
             </div>
+
+            @*FilePicketr para a foto do produto*@
+            @* 'file picker' para efectuar a submissão de uma imagem *@
             <div class="form-group">
-                <input type="submit" value="Criar" class="btn btn-primary" />
+                <label class="control-label">Fotografia</label>
+                <input type="file" accept=".png, .jpg, .jpeg" name="fotografia" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Editar" class="btn btn-primary" />
             </div>
         </form>
     </div>

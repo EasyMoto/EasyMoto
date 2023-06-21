@@ -59,10 +59,11 @@
                     {
                    <text>
                        <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                       <a asp-action="Details" asp-route-id="@item.Id">Detalhes </a> 
+                       <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> 
                                 @if (User.Identity.Name == "admin@easymoto.com")
                                 {
-                                    <a asp-action="Delete" asp-route-id="@item.Id">| Eliminar</a>
+                                    <text> | </text>
+                                    <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
                                 }
                    </text>         
                }

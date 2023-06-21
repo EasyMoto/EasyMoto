@@ -5,10 +5,13 @@
 }
 
 <h2>Lista de Produtos</h2>
+@if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
+{
+    <p>
+        <a asp-action="Create">Criar novo Produto</a>
+    </p>
+}
 
-<p>
-    <a asp-action="Create">Criar novo Produto</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -79,9 +82,15 @@
                 @Html.DisplayFor(modelItem => item.Utilizador.Nome)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a>
+                    @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
+                    {
+                        <text>
+                            <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a> |
+                        </text>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
+                    
             </td>
         </tr>
 }

@@ -9,32 +9,28 @@ using EasyMoto.Data;
 using EasyMoto.Models;
 using Microsoft.Extensions.Hosting;
 using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace EasyMoto.Controllers
 {
-    [Authorize] // esta anotação obriga o utilizador a estar autenticado
-
     public class ProdutosController : Controller
     {
         /// <summary>
         /// atribuot para representar a Base de Dados
         /// </summary>
         private readonly ApplicationDbContext _context;
-        /// <summary>
-        /// objeto com os dados do servidor web
-        /// </summary>
+
         private readonly IWebHostEnvironment _environment;
+
         /// <summary>
-        /// ferramenta para aceder aos dados do utilizador
+        /// aceder aos dados do utilizador
         /// </summary>
         private readonly UserManager<IdentityUser> _userManager;
 
         //Instanciar no Construtor
         public ProdutosController(ApplicationDbContext context, IWebHostEnvironment environment, UserManager<IdentityUser> userManager)
-         {
-           
+        {
+
             _context = context;
             _environment = environment;
             _userManager = userManager;
@@ -47,17 +43,12 @@ namespace EasyMoto.Controllers
         /// Return  await porque o método é assíncrono
         /// </returns>
         // GET: Produtos
-        [AllowAnonymous] 
         public async Task<IActionResult> Index() //invoka a view que está aqui (Index)
         {
-
-            // var auxiliar
-            var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
-
             var applicationDbContext = _context.Produtos
                                                     .Include(p => p.Categoria)
                                                     .Include(p => p.Utilizador)
-                                                    .Where(a => a.Utilizador.UserId == userIdDaPessoaAutenticada);
+                                                    .Where(a => a.Utilizador.Nome == "Administrador");
 
 
             // invoco a view, fornecendo-lhe os dados que ela necessita
@@ -73,8 +64,8 @@ namespace EasyMoto.Controllers
                 return NotFound();
             }
 
-            // pesquisar os dados dos animais, para os mostrar no ecrã
-            var produto = await _context.Produtos// alterar nome da variavel para singular porque apenas estamos à procura de um animal
+            // pesquisar os dados dos produtos, para os mostrar no ecrã
+            var produto = await _context.Produtos// alterar nome da variavel para singular porque apenas estamos à procura de um produto
                 .Include(p => p.Categoria)
                 .Include(p => p.Utilizador)
                 .FirstOrDefaultAsync(m => m.Id == id);// igual ao LIMIT 1 caso retorne mais do que 1 resultado
@@ -109,22 +100,27 @@ namespace EasyMoto.Controllers
         /// o metodo create é usado quando fazemos o submit do novo produto e vamos ter um atributo = produto (SINGULAR) 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,MarcaFK,UtilizadorFK")] Produtos produto, IFormFile fotografia) { 
-                //vars auxiliar
-                bool existeFoto = false;
-                string  nomeFoto = "";
-            
-               if (produto.CategoriaFK == 0){
+        public async Task<IActionResult> Create([Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,MarcaFK,UtilizadorFK")] Produtos produto, IFormFile fotografia)
+        {
+            //vars auxiliar
+            bool existeFoto = false;
+            string nomeFoto = "";
+
+            if (produto.CategoriaFK == 0)
+            {
                 // se escolhi uma categoria
                 // gerar mensagem de erro
                 ModelState.AddModelError("", "Deve escolher uma categoria, por favor.");
-            } else {
+            }
+            else
+            {
                 if (produto.UtilizadorFK == 0)
-                    // não escolhi o utilizador
+                // não escolhi o utilizador
                 {
                     ModelState.AddModelError("", "Deve escolher um utilizador, por favor.");
                 }
-                else {
+                else
+                {
                     // se cheguei aqui é porqu e escolhi uma categoria e um utilizador
                     // vamos avaliar o ficheiro, se é que ele existe 
                     if (fotografia == null)
@@ -136,89 +132,96 @@ namespace EasyMoto.Controllers
                             Ficheiro = "noProduct.jpg"
                         });
 
-                    }else {
+                    }
+                    else
+                    {
 
                         // se chego aqui, existe ficheiro
                         // mas será imagem?
                         if (fotografia.ContentType != "image/jpeg" &&
-                            fotografia.ContentType != "image/png") {
+                            fotografia.ContentType != "image/png")
+                        {
                             // existe ficheiro mas não é uma imagem 
                             // <=> ! (fotografia.ContentType == "image/jpeg" || fotografia.ContentType == "image/png")
-                            
-                                ModelState.AddModelError("", "Forneceu um ficheiro que não é uma imagem. Escolha, um ficheiro do tipo PNG ou JPG.");
-                            }
 
-                            else {
-                                // há imagem 
-                                existeFoto = true; 
-                                // definir o nome do ficheiro
-                                Guid g = Guid.NewGuid();
-                                // transforma o guid que é um objeto no texto correspondente 
-                                 nomeFoto = produto.UtilizadorFK + "_" + g.ToString();
-                                // o objeto path dá-nos a extensão do nome que é colado no fileName, tolower para ficar tudo em minusculas(?)
-                                string extensao = Path.GetExtension(fotografia.FileName).ToLower();
-                                nomeFoto+= extensao;
-                                // onde o guardar?
-                                // vamos gurardor o ficheiro na pasta 'wwwroot'
-                                // mas apenas após guardarmos os dados do produto na BD 
+                            ModelState.AddModelError("", "Forneceu um ficheiro que não é uma imagem. Escolha, um ficheiro do tipo PNG ou JPG.");
+                        }
 
-                                // guardar os dados do ficheiro na BD
-                                produto.ListaFotografias
-                                    .Add(new Fotografias {
-                                        Ficheiro=nomeFoto,
-                                        Data = DateTime.Now,
+                        else
+                        {
+                            // há imagem 
+                            existeFoto = true;
+                            // definir o nome do ficheiro
+                            Guid g = Guid.NewGuid();
+                            // transforma o guid que é um objeto no texto correspondente 
+                            nomeFoto = produto.UtilizadorFK + "_" + g.ToString();
+                            // o objeto path dá-nos a extensão do nome que é colado no fileName, tolower para ficar tudo em minusculas(?)
+                            string extensao = Path.GetExtension(fotografia.FileName).ToLower();
+                            nomeFoto += extensao;
+                            // onde o guardar?
+                            // vamos gurardor o ficheiro na pasta 'wwwroot'
+                            // mas apenas após guardarmos os dados do produto na BD 
+
+                            // guardar os dados do ficheiro na BD
+                            produto.ListaFotografias
+                                .Add(new Fotografias
+                                {
+                                    Ficheiro = nomeFoto,
+                                    Data = DateTime.Now,
                                 });
 
 
-                            }
                         }
                     }
                 }
-            
+            }
 
-        
+
+
             try
             {
                 if (ModelState.IsValid)
                 {
-                        // adicionar os dados do 'produto'
-                        // à BD, mas apenas na memoria do servidor web
+                    // adicionar os dados do 'produto'
+                    // à BD, mas apenas na memoria do servidor web
                     _context.Add(produto);
-                        // transferir os dados para a BD
+                    // transferir os dados para a BD
                     await _context.SaveChangesAsync();
 
-                        // se cheguei aqui, vamos guardar o ficheiro no disco rígido
-                        if (existeFoto) 
+                    // se cheguei aqui, vamos guardar o ficheiro no disco rígido
+                    if (existeFoto)
+                    {
+                        string nomePastaFoto = _environment.WebRootPath;
+                        // juntar o nome da pasta onde serão guardadas as imagens
+                        nomePastaFoto = Path.Combine(nomePastaFoto, "imagens");
+                        //mas a pasta existe?
+                        if (!Directory.Exists(nomePastaFoto))
                         {
-                            string nomePastaFoto = _environment.WebRootPath;
-                            // juntar o nome da pasta onde serão guardadas as imagens
-                            nomePastaFoto = Path.Combine(nomePastaFoto, "imagens");
-                            //mas a pasta existe?
-                            if (!Directory.Exists(nomePastaFoto))
-                            { 
-                                Directory.CreateDirectory(nomePastaFoto);
-                            }
-
-                            //vamos iniciar a escrita do ficheiro no disco rigido
-                            nomeFoto = Path.Combine(nomePastaFoto, nomeFoto);
-                            using var stream = new FileStream(nomeFoto, FileMode.Create);
-                            await fotografia.CopyToAsync(stream);
-
-
+                            Directory.CreateDirectory(nomePastaFoto);
                         }
-                        
+
+                        //vamos iniciar a escrita do ficheiro no disco rigido
+                        nomeFoto = Path.Combine(nomePastaFoto, nomeFoto);
+                        using var stream = new FileStream(nomeFoto, FileMode.Create);
+                        await fotografia.CopyToAsync(stream);
+
+
+                    }
+
 
                     return RedirectToAction(nameof(Index));
                 }
-            } catch (Exception) 
-                
-                { ModelState.AddModelError("", "Ocorreu um erro no acesso à base de dados");
+            }
+            catch (Exception)
+
+            {
+                ModelState.AddModelError("", "Ocorreu um erro no acesso à base de dados");
                 //throw;
             }
 
             // preparar os dados para serem devolvidos para  View 
 
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias.OrderBy(r=>r.Nome), "Id", "Nome", produto.CategoriaFK);
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias.OrderBy(r => r.Nome), "Id", "Nome", produto.CategoriaFK);
             ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produto.CategoriaFK);
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
             return View(produto);
@@ -232,11 +235,8 @@ namespace EasyMoto.Controllers
                 return NotFound();
             }
 
-            // var auxiliar
-            var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
-
-            var produtos = await _context.Produtos.Where(a => a.Id == id && a.Utilizador.UserId == userIdDaPessoaAutenticada).FirstOrDefaultAsync();
-
+            //para que não seja possível alterar o URL e editar produtos
+            var produtos = await _context.Produtos.Where(a => a.Utilizador.Nome == "Administrador").FirstOrDefaultAsync();
 
             if (produtos == null)
             {
@@ -253,34 +253,128 @@ namespace EasyMoto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,UtilizadorFK")] Produtos produto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,UtilizadorFK")] Produtos produto, IFormFile fotografia)
         {
-            if (id != produto.Id)
-            {
-                return NotFound();
-            }
+            //vars auxiliar
+            bool existeFoto = false;
+            string nomeFoto = "";
 
-            if (ModelState.IsValid)
+            if (produto.CategoriaFK == 0)
             {
-                try
+                // se escolhi uma categoria
+                // gerar mensagem de erro
+                ModelState.AddModelError("", "Deve escolher uma categoria, por favor.");
+            }
+            else
+            {
+                if (produto.UtilizadorFK == 0)
+                // não escolhi o utilizador
                 {
-                    _context.Update(produto);
-                    await _context.SaveChangesAsync();
+                    ModelState.AddModelError("", "Deve escolher um utilizador, por favor.");
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!ProdutosExists(produto.Id))
+                    // se cheguei aqui é porqu e escolhi uma categoria e um utilizador
+                    // vamos avaliar o ficheiro, se é que ele existe 
+                    if (fotografia == null)
                     {
-                        return NotFound();
+                        // não há ficheiro (imagem)
+                        produto.ListaFotografias.Add(new Fotografias
+                        {
+                            Data = DateTime.Now,
+                            Ficheiro = "noProduct.jpg"
+                        });
+
                     }
                     else
                     {
-                        throw;
+
+                        // se chego aqui, existe ficheiro
+                        // mas será imagem?
+                        if (fotografia.ContentType != "image/jpeg" &&
+                            fotografia.ContentType != "image/png")
+                        {
+                            // existe ficheiro mas não é uma imagem 
+                            // <=> ! (fotografia.ContentType == "image/jpeg" || fotografia.ContentType == "image/png")
+
+                            ModelState.AddModelError("", "Forneceu um ficheiro que não é uma imagem. Escolha, um ficheiro do tipo PNG ou JPG.");
+                        }
+
+                        else
+                        {
+                            // há imagem 
+                            existeFoto = true;
+                            // definir o nome do ficheiro
+                            Guid g = Guid.NewGuid();
+                            // transforma o guid que é um objeto no texto correspondente 
+                            nomeFoto = produto.UtilizadorFK + "_" + g.ToString();
+                            // o objeto path dá-nos a extensão do nome que é colado no fileName, tolower para ficar tudo em minusculas(?)
+                            string extensao = Path.GetExtension(fotografia.FileName).ToLower();
+                            nomeFoto += extensao;
+                            // onde o guardar?
+                            // vamos gurardor o ficheiro na pasta 'wwwroot'
+                            // mas apenas após guardarmos os dados do produto na BD 
+
+                            // guardar os dados do ficheiro na BD
+                            produto.ListaFotografias
+                                .Add(new Fotografias
+                                {
+                                    Ficheiro = nomeFoto,
+                                    Data = DateTime.Now,
+                                });
+
+
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produto.CategoriaFK);
+
+
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // adicionar os dados do 'produto'
+                    // à BD, mas apenas na memoria do servidor web
+                    _context.Add(produto);
+                    // transferir os dados para a BD
+                    await _context.SaveChangesAsync();
+
+                    // se cheguei aqui, vamos guardar o ficheiro no disco rígido
+                    if (existeFoto)
+                    {
+                        string nomePastaFoto = _environment.WebRootPath;
+                        // juntar o nome da pasta onde serão guardadas as imagens
+                        nomePastaFoto = Path.Combine(nomePastaFoto, "imagens");
+                        //mas a pasta existe?
+                        if (!Directory.Exists(nomePastaFoto))
+                        {
+                            Directory.CreateDirectory(nomePastaFoto);
+                        }
+
+                        //vamos iniciar a escrita do ficheiro no disco rigido
+                        nomeFoto = Path.Combine(nomePastaFoto, nomeFoto);
+                        using var stream = new FileStream(nomeFoto, FileMode.Create);
+                        await fotografia.CopyToAsync(stream);
+
+
+                    }
+
+
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception)
+
+            {
+                ModelState.AddModelError("", "Ocorreu um erro no acesso à base de dados");
+                //throw;
+            }
+
+            // preparar os dados para serem devolvidos para  View 
+
+            ViewBag.CategoriaNome = new SelectList(_context.Categorias.OrderBy(r => r.Nome), "Id", "Nome", produto.CategoriaFK);
             ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produto.CategoriaFK);
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
             return View(produto);
@@ -320,14 +414,14 @@ namespace EasyMoto.Controllers
             {
                 _context.Produtos.Remove(produtos);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProdutosExists(int id)
         {
-          return _context.Produtos.Any(e => e.Id == id);
+            return _context.Produtos.Any(e => e.Id == id);
         }
     }
 }

@@ -12,23 +12,23 @@ namespace EasyMoto.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Utilizadores1Controller : ControllerBase
+    public class UtilizadoresAPIController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public Utilizadores1Controller(ApplicationDbContext context)
+        public UtilizadoresAPIController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Utilizadores1
+        // GET: api/UtilizadoresAPI
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Utilizadores>>> GetUtilizadores()
         {
             return await _context.Utilizadores.ToListAsync();
         }
 
-        // GET: api/Utilizadores1/5
+        // GET: api/UtilizadoresAPI/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Utilizadores>> GetUtilizadores(int id)
         {
@@ -42,7 +42,7 @@ namespace EasyMoto.Controllers
             return utilizadores;
         }
 
-        // PUT: api/Utilizadores1/5
+        // PUT: api/UtilizadoresAPI/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUtilizadores(int id, Utilizadores utilizadores)
@@ -73,7 +73,7 @@ namespace EasyMoto.Controllers
             return NoContent();
         }
 
-        // POST: api/Utilizadores1
+        // POST: api/UtilizadoresAPI
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Utilizadores>> PostUtilizadores(Utilizadores utilizadores)
@@ -84,7 +84,7 @@ namespace EasyMoto.Controllers
             return CreatedAtAction("GetUtilizadores", new { id = utilizadores.Id }, utilizadores);
         }
 
-        // DELETE: api/Utilizadores1/5
+        // DELETE: api/UtilizadoresAPI/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUtilizadores(int id)
         {

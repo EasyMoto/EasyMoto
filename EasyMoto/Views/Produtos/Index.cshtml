@@ -1,98 +1,141 @@
-﻿@model IEnumerable<EasyMoto.Models.Produtos>
+﻿@using System.IO
+@using Microsoft.AspNetCore.Mvc
+
+@model IEnumerable<EasyMoto.Models.Produtos>
+
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Lista de Produtos</h2>
+<head>
+    <link rel="stylesheet" href="~/css/produtos.css" />
+</head>
+
+
 @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
 {
+    <h2>Lista de Produtos</h2>
     <p>
         <a asp-action="Create">Criar novo Produto</a>
     </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Nome)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Preco)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Descricao)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tamanho)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Genero)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cor)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Colecao)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Categoria)
+                </th>
+                <th>
+                    @Html.DisplayName("Marca")
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Utilizador)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Nome)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Preco)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Descricao)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Tamanho)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Genero)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Cor)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Colecao)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Categoria.Nome)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Categoria.Marca)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Utilizador.Nome)
+                    </td>
+                    <td>
+                        @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
+                        {
+                            <text>
+                                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                                <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a> |
+                            </text>
+                        }
+                        <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+
+    <div class="produtos-background">
+        <h1> EasyMoto</h1>
+        <h4>Usufrui da tua viagem em segurança</h4>
+    </div>
+    <div class="icon-container">
+        <div class="row justify-content-md-center">
+            @{
+                // Ir buscar as imagens dos icons - todas as imagens que têm no nome "icon-"
+                var imageFiles = new[]
+                {
+                    "icon-boots.png",
+                    "icon-helmets.png",
+                    "icon-jackets.png",
+                    "icon-gloves.png",
+                    "icon-pants.png"
+                };
+            }
+
+           
+
+            @foreach (var imagePath in imageFiles)
+            {
+                <div class="col-2 col-md-2 col-lg-1">
+                    <img class="icons" src="~/images/@imagePath" />
+                </div>
+            }
+        </div>
+    </div>
 }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Preco)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Tamanho)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Genero)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cor)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Colecao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Categoria)
-            </th>
-            <th>
-                @Html.DisplayName("Marca")
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Utilizador)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Preco)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tamanho)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Genero)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cor)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Colecao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categoria.Nome)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Categoria.Marca)
-                </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Utilizador.Nome)
-            </td>
-            <td>
-                    @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
-                    {
-                        <text>
-                            <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                            <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a> |
-                        </text>
-                    }
-                    <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
-                    
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+

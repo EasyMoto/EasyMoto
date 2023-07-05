@@ -20,7 +20,7 @@ namespace EasyMoto.Controllers
         /// <summary>
         /// atribuot para representar a Base de Dados
         /// </summary>
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _bd;
 
         private readonly IWebHostEnvironment _environment;
 
@@ -33,7 +33,7 @@ namespace EasyMoto.Controllers
         public ProdutosController(ApplicationDbContext context, IWebHostEnvironment environment, UserManager<IdentityUser> userManager)
         {
 
-            _context = context;
+            _bd = context;
             _environment = environment;
             _userManager = userManager;
         }
@@ -48,7 +48,7 @@ namespace EasyMoto.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index() //invoka a view que está aqui (Index)
         {
-            var applicationDbContext = _context.Produtos
+            var applicationDbContext = _bd.Produtos
                                                     .Include(p => p.Categoria)
                                                     .Include(p => p.Utilizador)
                                                     .Where(a => a.Utilizador.Nome == "Administrador");
@@ -62,16 +62,17 @@ namespace EasyMoto.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)//"?" significa que é um parâmetro que pode ser nulo
         {// proteção à pesquisa, caso a tabela dos Produtos esteja vazia ou o Id seja nulo
-            if (id == null || _context.Produtos == null)
+            if (id == null || _bd.Produtos == null)
             {
                 //"?" significa que é um parâmetro que pode ser nulo
                 return NotFound();
             }
 
             // pesquisar os dados dos produtos, para os mostrar no ecrã
-            var produto = await _context.Produtos// alterar nome da variavel para singular porque apenas estamos à procura de um produto
+            var produto = await _bd.Produtos// alterar nome da variavel para singular porque apenas estamos à procura de um produto
                 .Include(p => p.Categoria)
                 .Include(p => p.Utilizador)
+                .Include(p => p.ListaFotografias)
                 .FirstOrDefaultAsync(m => m.Id == id);// igual ao LIMIT 1 caso retorne mais do que 1 resultado
 
             // proteção à pesquisa, caso o Id não exista
@@ -97,9 +98,9 @@ namespace EasyMoto.Controllers
             }
             //chaves forasteiras para as tabelas "Categorias" e " Utilizadores"
             //preparar os dados que vão ficar associados às chaves forasteiras - trasportar dados do Controller para a View
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome");
-            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca");
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome");
+            ViewBag.CategoriaNome = new SelectList(_bd.Categorias, "Id", "Nome");
+            ViewBag.CategoriaMarca = new SelectList(_bd.Categorias, "Id", "Marca");
+            ViewData["UtilizadorFK"] = new SelectList(_bd.Utilizadores, "Id", "Nome");
             return View();
         }
 
@@ -193,9 +194,9 @@ namespace EasyMoto.Controllers
                 {
                     // adicionar os dados do 'produto'
                     // à BD, mas apenas na memoria do servidor web
-                    _context.Add(produto);
+                    _bd.Add(produto);
                     // transferir os dados para a BD
-                    await _context.SaveChangesAsync();
+                    await _bd.SaveChangesAsync();
 
                     // se cheguei aqui, vamos guardar o ficheiro no disco rígido
                     if (existeFoto)
@@ -230,9 +231,9 @@ namespace EasyMoto.Controllers
 
             // preparar os dados para serem devolvidos para  View 
 
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias.OrderBy(r => r.Nome), "Id", "Nome", produto.CategoriaFK);
-            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produto.CategoriaFK);
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
+            ViewBag.CategoriaNome = new SelectList(_bd.Categorias.OrderBy(r => r.Nome), "Id", "Nome", produto.CategoriaFK);
+            ViewBag.CategoriaMarca = new SelectList(_bd.Categorias, "Id", "Marca", produto.CategoriaFK);
+            ViewData["UtilizadorFK"] = new SelectList(_bd.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
             return View(produto);
         }
 
@@ -244,24 +245,25 @@ namespace EasyMoto.Controllers
                 //retornar para Index se o utilizador não tiver acesso
                 return RedirectToAction("Details", new { id = id });
             }
-            if (id == null || _context.Produtos == null)
+            if (id == null || _bd.Produtos == null)
             {
                 return RedirectToAction("Index");
             }
 
             //para que não seja possível alterar o URL e editar produtos
-            var produtos = await _context.Produtos
+            var produtos = await _bd.Produtos
+                                     .Include(p => p.ListaFotografias)
                                      .Where(a => a.Id == id &&
                                                  a.Utilizador.Nome == "Administrador")
                                      .FirstOrDefaultAsync();
 
             if (produtos == null)
-            {
+            {   //redirecionamento para a pagina do Index
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produtos.CategoriaFK);
-            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produtos.CategoriaFK);
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produtos.UtilizadorFK);
+            ViewBag.CategoriaNome = new SelectList(_bd.Categorias, "Id", "Nome", produtos.CategoriaFK);
+            ViewBag.CategoriaMarca = new SelectList(_bd.Categorias, "Id", "Marca", produtos.CategoriaFK);
+            ViewData["UtilizadorFK"] = new SelectList(_bd.Utilizadores, "Id", "Nome", produtos.UtilizadorFK);
             return View(produtos);
         }
 
@@ -344,8 +346,6 @@ namespace EasyMoto.Controllers
                                     Ficheiro = nomeFoto,
                                     Data = DateTime.Now,
                                 });
-
-
                         }
                     }
                 }
@@ -358,9 +358,9 @@ namespace EasyMoto.Controllers
                 {
                     // adicionar os dados do 'produto'
                     // à BD, mas apenas na memoria do servidor web
-                    _context.Update(produto);
+                    _bd.Update(produto);
                     // transferir os dados para a BD
-                    await _context.SaveChangesAsync();
+                    await _bd.SaveChangesAsync();
 
                     // se cheguei aqui, vamos guardar o ficheiro no disco rígido
                     if (existeFoto)
@@ -394,9 +394,9 @@ namespace EasyMoto.Controllers
             }
 
 
-            ViewBag.CategoriaNome = new SelectList(_context.Categorias, "Id", "Nome", produto.CategoriaFK);
-            ViewBag.CategoriaMarca = new SelectList(_context.Categorias, "Id", "Marca", produto.CategoriaFK);
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
+            ViewBag.CategoriaNome = new SelectList(_bd.Categorias, "Id", "Nome", produto.CategoriaFK);
+            ViewBag.CategoriaMarca = new SelectList(_bd.Categorias, "Id", "Marca", produto.CategoriaFK);
+            ViewData["UtilizadorFK"] = new SelectList(_bd.Utilizadores, "Id", "Nome", produto.UtilizadorFK);
             return View(produto);
         }
 
@@ -409,12 +409,12 @@ namespace EasyMoto.Controllers
                 //retornar para Index se o utilizador não tiver acesso
                 return RedirectToAction("Index");
             }
-            if (id == null || _context.Produtos == null)
+            if (id == null || _bd.Produtos == null)
             {
                 return RedirectToAction("Index");
             }
 
-            var produtos = await _context.Produtos
+            var produtos = await _bd.Produtos
                 .Include(p => p.Categoria)
                 .Include(p => p.Utilizador)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -431,23 +431,23 @@ namespace EasyMoto.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Produtos == null)
+            if (_bd.Produtos == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Produtos'  is null.");
             }
-            var produtos = await _context.Produtos.FindAsync(id);
+            var produtos = await _bd.Produtos.FindAsync(id);
             if (produtos != null)
             {
-                _context.Produtos.Remove(produtos);
+                _bd.Produtos.Remove(produtos);
             }
 
-            await _context.SaveChangesAsync();
+            await _bd.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProdutosExists(int id)
         {
-            return _context.Produtos.Any(e => e.Id == id);
+            return _bd.Produtos.Any(e => e.Id == id);
         }
 
     }

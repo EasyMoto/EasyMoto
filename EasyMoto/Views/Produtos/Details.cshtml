@@ -10,52 +10,52 @@
     <h4>@Html.DisplayFor(model => model.Nome)</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Nome)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Nome)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Preco)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Preco)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Descricao)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Descricao)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Tamanho)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Tamanho)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Genero)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Genero)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Cor)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Cor)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Colecao)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Colecao)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Categoria)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Categoria.Nome)
         </dd>
         <dt class="col-sm-2">
@@ -64,13 +64,26 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Categoria.Marca)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Utilizador)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Utilizador.Nome)
+        <dd class="col-sm-10">
+            <a asp-action="Details" asp-controller="Utilizadores" asp-route-id="@Model.Utilizador?.Id">
+                @Html.DisplayFor(model => model.Utilizador.Nome)
+            </a>
         </dd>
     </dl>
+
+    @* Listar Fotografias *@
+    <h4>Fotografias</h4>
+    @foreach (var foto in Model.ListaFotografias)
+    {
+            <img src="~/imagens/@foto.Ficheiro"
+                 alt="fotografia do @Model.Nome"
+                 title="@Model.Nome (@Model.Categoria.Nome)"
+                 width="100px" />
+    }
+
 </div>
 <div>
     @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")

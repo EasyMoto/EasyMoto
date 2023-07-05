@@ -9,7 +9,9 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+
+        @*colocar o enctype por causa do upload das fotos*@
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -87,8 +89,25 @@
                 </select>
             </div>
 
-            @*FilePicketr para a foto do produto*@
-            @* 'file picker' para efectuar a submissão de uma imagem *@
+            @* Listar Fotografias *@
+            <label>Fotografias</label>
+            <p>Atenção!!! As fotos selecionadas irão ser apagadas</p>
+            <div>
+                @foreach (var foto in Model.ListaFotografias)
+                {
+                    <input type="checkbox" name="selectedPhotos" value="@foto.Id" class="photo-checkbox" />
+                    <img src="~/imagens/@foto.Ficheiro"
+                         alt="fotografia do @Model.Nome"
+                         title="@Model.Nome (@Model.Categoria.Nome)"
+                         width="100px"
+                         onclick="toggleCheckbox(this)"
+                         class="selectable-photo" />
+                         <br/>
+                }
+            </div>
+
+            @*FilePicker para a foto do produto*@
+            @* 'file picker' para efetuar a submissão de uma imagem *@
             <div class="form-group">
                 <label class="control-label">Fotografia</label>
                 <input type="file" accept=".png, .jpg, .jpeg" name="fotografia" />
@@ -98,6 +117,7 @@
                 <input type="submit" value="Editar" class="btn btn-primary" />
             </div>
         </form>
+
     </div>
 </div>
 
@@ -106,5 +126,11 @@
 </div>
 
 @section Scripts {
+    <script>
+        function toggleCheckbox(img) {
+            var checkbox = img.parentNode.querySelector('.photo-checkbox');
+            checkbox.checked = !checkbox.checked;
+        }
+    </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

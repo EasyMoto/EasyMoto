@@ -272,7 +272,7 @@ namespace EasyMoto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,MarcaFK,UtilizadorFK")] Produtos produto, IFormFile fotografia)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,Descricao,Tamanho,Genero,Cor,Colecao,CategoriaFK,MarcaFK,UtilizadorFK,SelectedPhotos")] Produtos produto, IFormFile fotografia, List<string> selectedPhotos)
         {
             if (id != produto.Id)
             {
@@ -298,9 +298,10 @@ namespace EasyMoto.Controllers
                 }
                 else
                 {
+                    var countFotos = produto.ListaFotografias.Count;
                     // se cheguei aqui é porqu e escolhi uma categoria e um utilizador
                     // vamos avaliar o ficheiro, se é que ele existe 
-                    if (fotografia == null)
+                    if (fotografia == null && countFotos != 0)
                     {
                         // não há ficheiro (imagem)
                         produto.ListaFotografias.Add(new Fotografias
@@ -310,7 +311,7 @@ namespace EasyMoto.Controllers
                         });
 
                     }
-                    else
+                    else if (fotografia != null)
                     {
 
                         // se chego aqui, existe ficheiro
@@ -349,6 +350,26 @@ namespace EasyMoto.Controllers
                         }
                     }
                 }
+            }
+
+            foreach (var file in selectedPhotos)
+            {
+                //Encontrar a foto na lista de fotografias
+                var photo = produto.ListaFotografias.FirstOrDefault(f => f.Ficheiro == file);
+                var photoToDelete = _bd.Fotografias.FirstOrDefault(f => f.Ficheiro == file);
+                if ( photoToDelete != null)
+                {
+                    // Remover a fotografia da lista
+                    //produto.ListaFotografias.Remove(photo);
+                    _bd.Fotografias.Remove(photoToDelete);
+                }
+                await _bd.SaveChangesAsync();
+                // Delete the photo file from the wwwroot/images folder
+                //var imagePath = Path.Combine(_hostEnvironment.WebRootPath, "images", filename);
+                //if (File.Exists(imagePath))
+                //{
+                //    File.Delete(imagePath);
+                //}
             }
 
 

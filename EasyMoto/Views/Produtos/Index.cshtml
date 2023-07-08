@@ -10,6 +10,7 @@
 
 <head>
     <link rel="stylesheet" href="~/css/produtos.css" />
+
 </head>
 
 
@@ -113,9 +114,8 @@ else
         <h4>Usufrui da tua viagem em segurança</h4>
     </div>
     <div class="icon-container">
-        <div class="row justify-content-md-center">
+        <div class="row justify-content-center">
             @{
-                // Ir buscar as imagens dos icons - todas as imagens que têm no nome "icon-"
                 var imageFiles = new[]
                 {
                     "icon-boots.png",
@@ -126,16 +126,17 @@ else
                 };
             }
 
-           
-
-            @foreach (var imagePath in imageFiles)
+            @foreach (var foto in imageFiles)
             {
-                <div class="col-2 col-md-2 col-lg-1">
-                    <img class="icons" src="~/images/@imagePath" />
+                <div class="col-2 col-md-2 col-lg-2">
+                    <img class="icons" src="~/imagens/@foto" alt="fotografia da categoria" title="Categoria" />
                 </div>
             }
         </div>
     </div>
 }
 
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+}
 

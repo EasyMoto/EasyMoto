@@ -33,3 +33,16 @@ code {
   padding: 10px;
   padding-left: 180px;
 }
+.icon-container{
+    margin-top:50px;
+    max-width: 100%;
+}
+
+.icons {
+    width: 100px;
+    height: 100px;
+    background-color: rgba(37, 37, 37, 0.3) !important;
+    border: none !important;
+    padding: 10px;
+    margin: 10px;
+}

@@ -9,7 +9,9 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+
+        @*colocar o enctype por causa do upload das fotos*@
+        <form asp-action="Edit" enctype="multipart/form-data" id="editForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -87,17 +89,35 @@
                 </select>
             </div>
 
-            @*FilePicketr para a foto do produto*@
-            @* 'file picker' para efectuar a submissão de uma imagem *@
+            @* Listar Fotografias *@
+            <label>Fotografias</label>
+            <p><b>Atenção!!! As fotos selecionadas irão ser apagadas</b></p>
+            <div>
+                @foreach (var foto in Model.ListaFotografias)
+                {
+                    <input type="checkbox" name="selectedPhotos" value="@foto.Ficheiro" class="photo-checkbox" />
+                    <p>@foto.Ficheiro</p>
+                    <img src="~/imagens/@foto.Ficheiro"
+                         alt="fotografia do @Model.Nome"
+                         width="100px"
+                         onclick="toggleCheckbox(this)"
+                         class="selectable-photo" />
+                    <br />
+                }
+            </div>
+
+            @*FilePicker para a foto do produto*@
+            @* 'file picker' para efetuar a submissão de uma imagem *@
             <div class="form-group">
                 <label class="control-label">Fotografia</label>
                 <input type="file" accept=".png, .jpg, .jpeg" name="fotografia" />
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Editar" class="btn btn-primary" />
+                <input type="submit" value="Editar" class="btn btn-primary" onclick="submitForm()" />
             </div>
         </form>
+
     </div>
 </div>
 
@@ -106,5 +126,36 @@
 </div>
 
 @section Scripts {
+    @*Lidar com as checkbox das fotos*@
+    <script>function toggleCheckbox(img) {
+            var checkbox = img.parentNode.querySelector('.photo-checkbox');
+            checkbox.checked = !checkbox.checked;
+        }</script>
+
+    @*Lidar com as fotos que são para apagar*@
+    <script>function submitForm() {
+            var checkboxes = document.querySelectorAll('.photo-checkbox');
+            var selectedPhotos = Array.from(checkboxes)
+                .filter(function (checkbox) {
+                    return checkbox.checked;
+                })
+                .map(function (checkbox) {
+                    return checkbox.value;
+                });
+
+            // Colocar as fotos como escondidas
+            var hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = 'selectedPhotos';
+            hiddenField.value = selectedPhotos.join(',');
+
+            // Acrescentar o facto de estarem escondidas ao formulário
+            var form = document.getElementById('editForm');
+            form.appendChild(hiddenField);
+
+            // Submeter formulário
+            form.submit();
+        }</script>
+
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

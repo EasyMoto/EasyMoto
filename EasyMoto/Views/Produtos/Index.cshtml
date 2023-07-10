@@ -134,38 +134,41 @@ else
             }
         </div>
     </div>
-    <div class="row">
-        @*Cartão para os produtos*@
-        @foreach (var produto in Model)
-        {
-            <div class="col-md-3">
-                <div class="home-product-card">
-                    <div class="image-card">
-                        @*Verificar se existem fotos*@
-                        @if (produto.ListaFotografias.Any())
-                        {
-                            <img src="~/imagens/@produto.ListaFotografias.FirstOrDefault()?.Ficheiro" alt="Imagem Produto" title="fotografia" class="card-img-top">
-                        }
-                        else
-                        {
-                            <div class="no-image-placeholder">
-                                <p>Não existe fotografia para o produto</p>
-                            </div>
-                        }
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">@produto.Preco €</h5>
-                        <p class="card-text">@produto.Nome</p>
-                        <a href="#" class="btn btn-primary">Ver Detalhes</a>
+    <div class="content">
+        <div class="row mb-4">
+            @*Cartão para os produtos*@
+            @foreach (var produto in Model)
+            {
+                <div class="col-md-3">
+                    <div class="home-product-card">
+                        <div class="image-card">
+                            @*Verificar se existem fotos*@
+                            @if (produto.ListaFotografias.Any())
+                            {
+                                <img src="~/imagens/@produto.ListaFotografias.FirstOrDefault()?.Ficheiro" alt="Imagem Produto" title="fotografia" class="card-img-top">
+                            }
+                            else
+                            {
+                                <div class="no-image-placeholder">
+                                    <p>Não existe fotografia para o produto</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-body">
+
+                            <h5 class="card-title">@produto.Preco €</h5>
+                            <p class="card-text">@produto.Nome</p>
+                            <a asp-action="Details" asp-route-id="@produto.Id" class="btn btn-primary">Detalhes</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 
-}
+        }
 
-@section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-}
+        @section Scripts {
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        }
 

@@ -18,7 +18,7 @@ namespace EasyMoto.Controllers
     public class ProdutosController : Controller
     {
         /// <summary>
-        /// atribuot para representar a Base de Dados
+        /// atributo para representar a Base de Dados
         /// </summary>
         private readonly ApplicationDbContext _bd;
 
@@ -51,6 +51,7 @@ namespace EasyMoto.Controllers
             var applicationDbContext = _bd.Produtos
                                                     .Include(p => p.Categoria)
                                                     .Include(p => p.Utilizador)
+                                                    .Include(p => p.ListaFotografias)
                                                     .Where(a => a.Utilizador.Nome == "Administrador");
 
 

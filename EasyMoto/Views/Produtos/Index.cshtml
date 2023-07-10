@@ -118,29 +118,32 @@ else
             @{
                 var imageFiles = new[]
                 {
-                    "icon-boots.png",
-                    "icon-helmets.png",
-                    "icon-jackets.png",
-                    "icon-gloves.png",
-                    "icon-pants.png"
+                    //Array com as Fotografias dos icons das categorias
+                    new { Name = "Botas", File = "icon-boots.png" },
+                    new { Name = "Capacetes", File = "icon-helmets.png" },
+                    new { Name = "Casacos", File = "icon-jackets.png" },
+                    new { Name = "Luvas", File = "icon-gloves.png" },
+                    new { Name = "Calcas", File = "icon-pants.png" }
                 };
             }
 
             @foreach (var foto in imageFiles)
             {
+                //Icons das categorias
                 <div class="col-2 col-md-2 col-lg-2">
-                    <img class="icons" src="~/imagens/@foto" alt="fotografia da categoria" title="Categoria" />
+                    <img class="icons" src="~/imagens/@foto.File" alt="fotografia da categoria" title="Categoria" data-category="@foto.Name" />
                 </div>
             }
         </div>
     </div>
     <div class="content">
-        <div class="row mb-4">
+        <div class="row mb-4" id="productContainer">
+            <h2 id="selectedCategory" class="text-center mt-4"></h2>
             @*Cartão para os produtos*@
             @foreach (var produto in Model)
             {
                 <div class="col-md-3">
-                    <div class="home-product-card">
+                    <div class="home-product-card" data-category="@produto.Categoria.Nome">
                         <div class="image-card">
                             @*Verificar se existem fotos*@
                             @if (produto.ListaFotografias.Any())
@@ -149,13 +152,14 @@ else
                             }
                             else
                             {
+                                //Mensagem para senão existirem fotos a mostrar
                                 <div class="no-image-placeholder">
                                     <p>Não existe fotografia para o produto</p>
                                 </div>
                             }
                         </div>
                         <div class="card-body">
-
+                            @*Informação do produto no cartão*@
                             <h5 class="card-title">@produto.Preco €</h5>
                             <p class="card-text">@produto.Nome</p>
                             <a asp-action="Details" asp-route-id="@produto.Id" class="btn btn-primary">Detalhes</a>
@@ -164,11 +168,69 @@ else
                 </div>
             }
         </div>
+        @*Mensagem que aparece quando não existem produtos*@
+        <h5 id="noProductsMessage" class="text-center mt-4">Não existem produtos a mostrar</h5>
+
     </div>
 
-        }
+}
 
-        @section Scripts {
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-        }
+@section Scripts {
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>$(document).ready(function () {
+            // Evento para quando se clica na categoria
+            $(".icons").click(function () {
+                var categoria = $(this).data("category");
+
+                // Mostrar ou esconder os produtos filtrados
+                $(".home-product-card").each(function () {
+                    var productoCategoria = $(this).data("category");
+
+                    // Comparar a categoria clicada com a do produto para saber se é para mostrar ou não
+                    if (productoCategoria === categoria) {
+                        $(this).show(); // Mostrar os produtos filtrados
+                    } else {
+                        $(this).hide(); // Esconder o produto que não foi filtrado
+                    }
+                });
+
+                // Reordenar a lista de produtos pela categoria selecionada
+                var $productContainer = $("#productContainer");
+                var $productCards = $productContainer.find(".home-product-card");
+
+                $productCards.sort(function (a, b) {
+                    var categoriaA = $(a).data("category");
+                    var categoriaB = $(b).data("category");
+
+                    if (categoriaA === categoria && categoriaB !== categoria) {
+                        return -1;
+                    } else if (categoriaA !== categoria && categoriaB === categoria) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                // Se não existirem produtos para mostrar, mostrar mensagem com essa indicação
+                var visibleProductCards = $(".home-product-card:visible");
+                if (visibleProductCards.length > 0 || typeof categoria === 'undefined') {
+                    $("#noProductsMessage").hide();
+                } else {
+                    $("#noProductsMessage").show();
+                }
+
+                // Mostrar o nome da Categoria filtrada
+                var categoryName = $(this).data("category");
+                $("#selectedCategory").text(categoryName);
+
+                $productContainer.empty().append($productCards);
+
+                
+            });
+        });
+    </script>
+
+
+}
 

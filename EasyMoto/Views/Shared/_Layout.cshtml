@@ -22,12 +22,21 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Utilizadores" asp-action="">Utilizadores</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Categorias" asp-action="">Categorias</a>
-                        </li>
+                        @*Apenas conseguimos ver se estivermos logados*@
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Utilizadores" asp-action="">Utilizador</a>
+                            </li>
+                        }
+                        @*Apenas conseguimos ver se estivermos logados como administradores*@
+                        @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Categorias" asp-action="">Categorias</a>
+                            </li>
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Produtos" asp-action="">Produtos</a>
                         </li>

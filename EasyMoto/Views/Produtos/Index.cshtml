@@ -1,98 +1,234 @@
-﻿@model IEnumerable<EasyMoto.Models.Produtos>
+﻿@using System.IO
+@using Microsoft.AspNetCore.Mvc
+
+@model IEnumerable<EasyMoto.Models.Produtos>
+
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Lista de Produtos</h2>
+<head>
+    <link rel="stylesheet" href="~/css/produtos.css" />
+
+</head>
+
+
 @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
 {
+    <h2>Lista de Produtos</h2>
     <p>
         <a asp-action="Create">Criar novo Produto</a>
     </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Nome)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Preco)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Descricao)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tamanho)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Genero)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cor)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Colecao)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Categoria)
+                </th>
+                <th>
+                    @Html.DisplayName("Marca")
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Utilizador)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Nome)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Preco)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Descricao)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Tamanho)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Genero)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Cor)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Colecao)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Categoria.Nome)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Categoria.Marca)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Utilizador.Nome)
+                    </td>
+                    <td>
+                        @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
+                        {
+                            <text>
+                                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                                <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a> |
+                            </text>
+                        }
+                        <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+
+    <div class="produtos-background">
+        <h1> EasyMoto</h1>
+        <h4>Usufrui da tua viagem em segurança</h4>
+    </div>
+    <div class="icon-container">
+        <div class="row justify-content-center">
+            @{
+                var imageFiles = new[]
+                {
+                    //Array com as Fotografias dos icons das categorias
+                    new { Name = "Botas", File = "icon-boots.png" },
+                    new { Name = "Capacetes", File = "icon-helmets.png" },
+                    new { Name = "Casacos", File = "icon-jackets.png" },
+                    new { Name = "Luvas", File = "icon-gloves.png" },
+                    new { Name = "Calcas", File = "icon-pants.png" }
+                };
+            }
+
+            @foreach (var foto in imageFiles)
+            {
+                //Icons das categorias
+                <div class="col-2 col-md-2 col-lg-2">
+                    <img class="icons" src="~/imagens/@foto.File" alt="fotografia da categoria" title="Categoria" data-category="@foto.Name" />
+                </div>
+            }
+        </div>
+    </div>
+    <div class="content">
+        <div class="row mb-4" id="productContainer">
+            <h2 id="selectedCategory" class="text-center mt-4"></h2>
+            @*Cartão para os produtos*@
+            @foreach (var produto in Model)
+            {
+                <div class="col-md-3">
+                    <div class="home-product-card" data-category="@produto.Categoria.Nome">
+                        <div class="image-card">
+                            @*Verificar se existem fotos*@
+                            @if (produto.ListaFotografias.Any())
+                            {
+                                <img src="~/imagens/@produto.ListaFotografias.FirstOrDefault()?.Ficheiro" alt="Imagem Produto" title="fotografia" class="card-img-top">
+                            }
+                            else
+                            {
+                                //Mensagem para senão existirem fotos a mostrar
+                                <div class="no-image-placeholder">
+                                    <p>Não existe fotografia para o produto</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-body">
+                            @*Informação do produto no cartão*@
+                            <h5 class="card-title">@produto.Preco €</h5>
+                            <p class="card-text">@produto.Nome</p>
+                            <a asp-action="Details" asp-route-id="@produto.Id" class="btn btn-primary">Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        @*Mensagem que aparece quando não existem produtos*@
+        <h5 id="noProductsMessage" class="text-center mt-4">Não existem produtos a mostrar</h5>
+
+    </div>
+
 }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Preco)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Tamanho)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Genero)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cor)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Colecao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Categoria)
-            </th>
-            <th>
-                @Html.DisplayName("Marca")
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Utilizador)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Preco)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tamanho)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Genero)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cor)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Colecao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categoria.Nome)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Categoria.Marca)
-                </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Utilizador.Nome)
-            </td>
-            <td>
-                    @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
-                    {
-                        <text>
-                            <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                            <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a> |
-                        </text>
+@section Scripts {
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>$(document).ready(function () {
+            // Evento para quando se clica na categoria
+            $(".icons").click(function () {
+                var categoria = $(this).data("category");
+
+                // Mostrar ou esconder os produtos filtrados
+                $(".home-product-card").each(function () {
+                    var productoCategoria = $(this).data("category");
+
+                    // Comparar a categoria clicada com a do produto para saber se é para mostrar ou não
+                    if (productoCategoria === categoria) {
+                        $(this).show(); // Mostrar os produtos filtrados
+                    } else {
+                        $(this).hide(); // Esconder o produto que não foi filtrado
                     }
-                    <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
-                    
-            </td>
-        </tr>
+                });
+
+                // Reordenar a lista de produtos pela categoria selecionada
+                var $productContainer = $("#productContainer");
+                var $productCards = $productContainer.find(".home-product-card");
+
+                $productCards.sort(function (a, b) {
+                    var categoriaA = $(a).data("category");
+                    var categoriaB = $(b).data("category");
+
+                    if (categoriaA === categoria && categoriaB !== categoria) {
+                        return -1;
+                    } else if (categoriaA !== categoria && categoriaB === categoria) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                // Se não existirem produtos para mostrar, mostrar mensagem com essa indicação
+                var visibleProductCards = $(".home-product-card:visible");
+                if (visibleProductCards.length > 0 || typeof categoria === 'undefined') {
+                    $("#noProductsMessage").hide();
+                } else {
+                    $("#noProductsMessage").show();
+                }
+
+                // Mostrar o nome da Categoria filtrada
+                var categoryName = $(this).data("category");
+                $("#selectedCategory").text(categoryName);
+
+                $productContainer.empty().append($productCards);
+
+
+            });
+        });</script>
+
+
 }
-    </tbody>
-</table>

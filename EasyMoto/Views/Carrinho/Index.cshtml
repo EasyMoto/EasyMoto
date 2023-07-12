@@ -1,0 +1,65 @@
+@model IEnumerable<EasyMoto.Models.Utilizadores>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Carrinho</h1>
+
+@{
+    var currentUserEmail = User.Identity.Name;
+    Utilizadores currentUser = null;
+}
+
+@*<p>@currentUserEmail</p>*@
+@foreach (var item in Model)
+{
+    if (item.Email == currentUserEmail)
+    {
+        currentUser = item;
+    }
+}
+
+<p>@currentUser.Nome</p>
+
+@if (currentUser != null && currentUser.ListaProdutos != null && currentUser.ListaProdutos.Any())
+{
+    <div class="content">
+        <div class="row mb-4" id="productContainer">
+            <h2 id="selectedCategory" class="text-center mt-4"></h2>
+            @*Cartão para os produtos*@
+            @foreach (var produto in currentUser.ListaProdutos)
+            {
+                <div class="col-md-3">
+                    <div class="home-product-card">
+                        <div class="image-card">
+                            @*Verificar se existem fotos*@
+                            @if (produto.ListaFotografias.Any())
+                            {
+                                <img src="~/imagens/@produto.ListaFotografias.FirstOrDefault()?.Ficheiro" alt="Imagem Produto" title="fotografia" class="card-img-top">
+                            }
+                            else
+                            {
+                                //Mensagem para senão existirem fotos a mostrar
+                                <div class="no-image-placeholder">
+                                    <p>Não existe fotografia para o produto</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-body">
+                            @*Informação do produto no cartão*@
+                            <h5 class="card-title">@produto.Preco €</h5>
+                            <p class="card-text">@produto.Nome</p>
+                            <a asp-action="Details" asp-controller="Produtos" asp-route-id="@produto.Id" class="btn btn-primary">Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    @*Mensagem que aparece quando não existem produtos*@
+    <h5 id="noProductsMessage" class="text-center mt-4">Não existem produtos a mostrar</h5>
+}

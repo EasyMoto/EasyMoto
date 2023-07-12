@@ -4,11 +4,17 @@
     ViewData["Title"] = "Início";
 }
 
-<h1>Utilizadores</h1>
+@if (User.Identity.IsAuthenticated && User.Identity.Name != "admin@easymoto.com") {
+    <h1>@User.Identity.Name</h1>
+}
+else {
+    <h1>Utilizadores</h1>
+}
+
 
 @*<p>
-    <a asp-action="Create">Criar novo Utilizador</a>
-</p>*@
+        <a asp-action="Create">Criar novo Utilizador</a>
+    </p>*@
 <table class="table">
     <thead>
         <tr>
@@ -34,42 +40,43 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Morada)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CodPostal)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Telemovel)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NIF)
-            <td>
-               @*se a pessoa estiver autenticada mostro *@
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Morada)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CodPostal)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Telemovel)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NIF)
+                <td>
+                    @*se a pessoa estiver autenticada mostro *@
                     @if (User.Identity.IsAuthenticated)
                     {
-                   <text>
-                       <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                       <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> 
-                                @if (User.Identity.Name == "admin@easymoto.com")
-                                {
-                                    <text> | </text>
-                                    <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
-                                }
-                   </text>         
-               }
+                        <text>
+                            <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                            <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
+                            @if (User.Identity.Name == "admin@easymoto.com")
+                            {
+                                <text> | </text>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+                    }
+                            </text>
+                        }
 
-            </td>
-        </tr>
-}
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

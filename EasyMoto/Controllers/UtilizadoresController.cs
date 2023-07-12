@@ -54,9 +54,9 @@ namespace EasyMoto.Controllers
             }
             else
             {
-                var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
+                var userName = User.Identity.Name;
                 var applicationDbContext = _bd.Utilizadores
-                    .Where(a => a.UserId == userIdDaPessoaAutenticada);
+                    .Where(a => a.Email == userName);
                 return View(await applicationDbContext.ToListAsync());
             }
         }

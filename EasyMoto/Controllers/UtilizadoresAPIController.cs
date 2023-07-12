@@ -14,25 +14,25 @@ namespace EasyMoto.Controllers
     [ApiController]
     public class UtilizadoresAPIController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _bd;
 
         public UtilizadoresAPIController(ApplicationDbContext context)
         {
-            _context = context;
+            _bd = context;
         }
 
         // GET: api/UtilizadoresAPI
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Utilizadores>>> GetUtilizadores()
         {
-            return await _context.Utilizadores.ToListAsync();
+            return await _bd.Utilizadores.ToListAsync();
         }
 
         // GET: api/UtilizadoresAPI/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Utilizadores>> GetUtilizadores(int id)
         {
-            var utilizadores = await _context.Utilizadores.FindAsync(id);
+            var utilizadores = await _bd.Utilizadores.FindAsync(id);
 
             if (utilizadores == null)
             {
@@ -52,11 +52,11 @@ namespace EasyMoto.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(utilizadores).State = EntityState.Modified;
+            _bd.Entry(utilizadores).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _bd.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,8 +78,8 @@ namespace EasyMoto.Controllers
         [HttpPost]
         public async Task<ActionResult<Utilizadores>> PostUtilizadores(Utilizadores utilizadores)
         {
-            _context.Utilizadores.Add(utilizadores);
-            await _context.SaveChangesAsync();
+            _bd.Utilizadores.Add(utilizadores);
+            await _bd.SaveChangesAsync();
 
             return CreatedAtAction("GetUtilizadores", new { id = utilizadores.Id }, utilizadores);
         }
@@ -88,21 +88,21 @@ namespace EasyMoto.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUtilizadores(int id)
         {
-            var utilizadores = await _context.Utilizadores.FindAsync(id);
+            var utilizadores = await _bd.Utilizadores.FindAsync(id);
             if (utilizadores == null)
             {
                 return NotFound();
             }
 
-            _context.Utilizadores.Remove(utilizadores);
-            await _context.SaveChangesAsync();
+            _bd.Utilizadores.Remove(utilizadores);
+            await _bd.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool UtilizadoresExists(int id)
         {
-            return _context.Utilizadores.Any(e => e.Id == id);
+            return _bd.Utilizadores.Any(e => e.Id == id);
         }
     }
 }

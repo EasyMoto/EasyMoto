@@ -10,16 +10,18 @@ using EasyMoto.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
-namespace EasyMoto.Controllers {
+namespace EasyMoto.Controllers
+{
 
     [Authorize] // esta anotação obriga o utilizador a estar autenticado 
 
-    public class UtilizadoresController : Controller {
+    public class UtilizadoresController : Controller
+    {
 
         /// <summary>
         /// objeto para referenciar a base de dados 
         /// </summary>
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _bd;
 
         /// <summary>
         /// ferramenta para aceder aos dados do utilizador
@@ -30,7 +32,7 @@ namespace EasyMoto.Controllers {
         public UtilizadoresController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
 
         {
-            _context = context;
+            _bd = context;
             _userManager = userManager;
 
         }
@@ -46,14 +48,14 @@ namespace EasyMoto.Controllers {
 
             if (User.Identity.Name == "admin@easymoto.com")
             {
-                return _context.Utilizadores != null ?
-                          View(await _context.Utilizadores.ToListAsync()) :
+                return _bd.Utilizadores != null ?
+                          View(await _bd.Utilizadores.ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.Categorias'  is null.");
             }
             else
             {
                 var userIdDaPessoaAutenticada = _userManager.GetUserId(User);
-                var applicationDbContext = _context.Utilizadores
+                var applicationDbContext = _bd.Utilizadores
                     .Where(a => a.UserId == userIdDaPessoaAutenticada);
                 return View(await applicationDbContext.ToListAsync());
             }
@@ -63,12 +65,12 @@ namespace EasyMoto.Controllers {
         // GET: Utilizadores/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Utilizadores == null)
+            if (id == null || _bd.Utilizadores == null)
             {
                 return NotFound();
             }
 
-            var utilizadores = await _context.Utilizadores
+            var utilizadores = await _bd.Utilizadores
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (utilizadores == null)
@@ -95,8 +97,8 @@ namespace EasyMoto.Controllers {
         //{
         //    if (ModelState.IsValid)
         //    {
-        //        _context.Add(utilizadores);
-        //        await _context.SaveChangesAsync();
+        //        _bd.Add(utilizadores);
+        //        await _bd.SaveChangesAsync();
         //        return RedirectToAction(nameof(Index));
         //    }
         //    // Apanhar mensagens de erro
@@ -114,12 +116,12 @@ namespace EasyMoto.Controllers {
         // GET: Utilizadores/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Utilizadores == null)
+            if (id == null || _bd.Utilizadores == null)
             {
                 return NotFound();
             }
 
-            var utilizadores = await _context.Utilizadores.FindAsync(id);
+            var utilizadores = await _bd.Utilizadores.FindAsync(id);
             if (utilizadores == null)
             {
                 return NotFound();
@@ -143,8 +145,8 @@ namespace EasyMoto.Controllers {
             {
                 try
                 {
-                    _context.Update(utilizadores);
-                    await _context.SaveChangesAsync();
+                    _bd.Update(utilizadores);
+                    await _bd.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -165,12 +167,12 @@ namespace EasyMoto.Controllers {
         // GET: Utilizadores/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Utilizadores == null)
+            if (id == null || _bd.Utilizadores == null)
             {
                 return NotFound();
             }
 
-            var utilizadores = await _context.Utilizadores
+            var utilizadores = await _bd.Utilizadores
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (utilizadores == null)
             {
@@ -185,23 +187,23 @@ namespace EasyMoto.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Utilizadores == null)
+            if (_bd.Utilizadores == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Utilizadores'  is null.");
             }
-            var utilizadores = await _context.Utilizadores.FindAsync(id);
+            var utilizadores = await _bd.Utilizadores.FindAsync(id);
             if (utilizadores != null)
             {
-                _context.Utilizadores.Remove(utilizadores);
+                _bd.Utilizadores.Remove(utilizadores);
             }
-            
-            await _context.SaveChangesAsync();
+
+            await _bd.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UtilizadoresExists(int id)
         {
-          return (_context.Utilizadores?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_bd.Utilizadores?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

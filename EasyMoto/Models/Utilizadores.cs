@@ -88,7 +88,6 @@ namespace EasyMoto.Models
 
         /// <summary>
         /// Lista dos produtos que o utilizador comprou
-        /// (concretização do relacionamento M-N)
         /// </summary>
         public ICollection<Categorias> ListaCategorias { get; set; }
 

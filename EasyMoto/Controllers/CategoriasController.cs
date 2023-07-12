@@ -24,7 +24,7 @@ namespace EasyMoto.Controllers
             _context = context;
         }
 
-        [AllowAnonymous]
+        
         // GET: Categorias
         public async Task<IActionResult> Index()
         {

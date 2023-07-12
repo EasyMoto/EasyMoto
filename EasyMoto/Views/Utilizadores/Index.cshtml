@@ -4,7 +4,7 @@
     ViewData["Title"] = "Início";
 }
 
-@if (User.Identity.IsAuthenticated) {
+@if (User.Identity.IsAuthenticated && User.Identity.Name != "admin@easymoto.com") {
     <h1>@User.Identity.Name</h1>
 }
 else {

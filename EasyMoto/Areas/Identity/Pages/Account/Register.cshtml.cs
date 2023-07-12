@@ -165,8 +165,9 @@ namespace EasyMoto.Areas.Identity.Pages.Account
 
                     // atualização dos dados do criador
                     Input.Password = Input.Password;
+                    Input.utilizadores.Email = user.Email;
                     Input.utilizadores.UserId = user.Id;
-                    // adicionar os dados do criador à BD
+                    // adicionar os dados do utilizador à BD
                     try {
                         _context.Utilizadores.Add(Input.utilizadores);
                        await _context.SaveChangesAsync();

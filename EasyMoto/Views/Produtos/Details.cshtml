@@ -131,8 +131,10 @@
                     <strong>Marca:</strong> @Model.Categoria.Marca<br>
                     <strong>Utilizador:</strong> @Model.Utilizador.Nome<br>
                 </p>
-
-                <button class="btn btn-primary">Adicionar ao Carrinho</button>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <button class="btn btn-primary">Adicionar ao Carrinho</button>
+                }
                 <a asp-action="Index" class="btn btn-primary">Voltar à lista</a>
             </div>
         </div>

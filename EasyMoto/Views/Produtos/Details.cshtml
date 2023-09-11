@@ -4,6 +4,7 @@
     ViewData["Title"] = "Details";
 }
 
+
 @if (User.Identity.IsAuthenticated && @User.Identity.Name == "admin@easymoto.com")
 {
     <h2>Detalhes dos Produtos</h2>
@@ -96,6 +97,10 @@
     else
     {
         //Vista para os clientes da loja
+
+
+        <p></p>
+
     <div class="container">
         <div class="row">
             <div class="col-md-6">
@@ -129,15 +134,23 @@
                     <strong>Cor:</strong> @Model.Cor<br>
                     <strong>Coleção:</strong> @Model.Colecao<br>
                     <strong>Marca:</strong> @Model.Categoria.Marca<br>
-                    <strong>Utilizador:</strong> @Model.Utilizador.Nome<br>
+                    <!-- <strong>Utilizador:</strong> @Model.Utilizador.Nome<br> -->
                 </p>
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <button class="btn btn-primary">Adicionar ao Carrinho</button>
+                   //<button class="btn btn-primary">Adicionar ao Carrinho</button>
+                    <form method="post" action="@Url.Action("AdicionarCarrinho", "Produtos")">
+                        <input type="hidden" name="produtoId" value="@Model.Id" />
+                        <input type="hidden" name="userEmail" value="@User.Identity.Name" />
+                        <button type="submit" class="btn btn-primary">Adicionar ao Carrinho</button>
+                    </form>
                 }
                 <a asp-action="Index" class="btn btn-primary">Voltar à lista</a>
             </div>
         </div>
+
+
+
     </div>
 
 

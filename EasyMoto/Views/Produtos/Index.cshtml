@@ -214,17 +214,12 @@ else
 
                 // Se não existirem produtos para mostrar, mostrar mensagem com essa indicação
                 var visibleProductCards = $(".home-product-card:visible");
-                if (visibleProductCards.length > 0 || typeof categoria === 'undefined') {
+                if (visibleProductCards.length > 0) {
                     $("#noProductsMessage").hide();
                 } else {
                     $("#noProductsMessage").show();
                 }
 
-                // Mostrar o nome da Categoria filtrada
-                var categoryName = $(this).data("category");
-                $("#selectedCategory").text(categoryName);
-
-                $productContainer.empty().append($productCards);
 
                 
             });

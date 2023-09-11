@@ -85,6 +85,44 @@ namespace EasyMoto.Controllers
             return View(produto);
         }
 
+
+        /// <summary>
+        /// Método para adicionar o produto ao carrinho do utilizador autenticado
+        /// </summary>
+        /// <param name="produtoId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> AdicionarCarrinho(int produtoId, string userEmail)
+        {
+            // Dados 
+            var produto = await _bd.Produtos
+                .Include(p => p.Categoria)
+                .Include(p => p.Utilizador)
+                .Include(p => p.ListaFotografias)
+                .FirstOrDefaultAsync(m => m.Id == produtoId);
+
+            var user = await _bd.Utilizadores.FirstOrDefaultAsync(u => u.Email == userEmail);
+
+
+            if (produto != null && user != null)
+            {
+                // Associar o produto com o utilizador 
+                produto.UtilizadorFK = user.Id;
+
+                // guardar alterações na BD
+                await _bd.SaveChangesAsync();
+
+                // Redirecionamento a avisar que foi adicionado o produto ao carrinho
+                return RedirectToAction(nameof(Index), "Carrinho");
+            }
+
+            // Erro a adicionar ao carrinho
+            return RedirectToAction(nameof(Index));
+        }
+
+
         /// <summary>
         /// invoca a view para criar um novo produto
         /// </summary>
